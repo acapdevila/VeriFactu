@@ -74,7 +74,7 @@ namespace VeriFactu.Config
         /// <summary>
         /// Ruta al directorio de configuración.
         /// </summary>
-        static string _Path = @"C:\EsteticSoft_Resources\VeriFactu\";
+        static readonly string _Path = @"C:\EsteticSoft_Resources\VeriFactu\";
 
         /// <summary>
         /// Ruta al directorio de la cadena de bloques.
@@ -247,6 +247,8 @@ namespace VeriFactu.Config
                     EndPointGetRecords = "https://facturae.irenesolutions.com:8050/Kivu/Taxes/Verifactu/Invoices/GetFilteredList",
                     EndPointValidateNIF = "https://facturae.irenesolutions.com:8050/Kivu/Taxes/Verifactu/Invoices/ValidateNIF",
                     EndPointGetAeatInvoices = "https://facturae.irenesolutions.com:8050/Kivu/Taxes/Verifactu/Invoices/GetAeatInvoices",
+                    EndPointGetFilteredList = "https://facturae.irenesolutions.com:8050/Kivu/Taxes/Verifactu/Invoices/GetFilteredList",
+                    EndPointCreateBatch = "https://facturae.irenesolutions.com:8050/Kivu/Taxes/Verifactu/Invoices/CreateBatch",
                     ServiceKey = "1234"
                 },
                 SkipNifAeatValidation = true,
@@ -278,27 +280,7 @@ namespace VeriFactu.Config
         /// <summary>
         /// Ruta al directorio de configuración.
         /// </summary>
-        public static string Path
-        {
-            get
-            {
-
-                if(string.IsNullOrEmpty(_Path))
-                    return Environment.GetFolderPath(
-                        Environment.SpecialFolder.CommonApplicationData) + $"{_PathSep}VeriFactu{_PathSep}";
-
-                return _Path;
-
-            }
-            set
-            {
-
-                _Path = value;
-                Get();
-
-            }
-
-        }
+        public static string Path => _Path;
 
         #endregion
 

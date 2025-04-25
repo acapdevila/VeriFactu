@@ -244,6 +244,71 @@
             Finaliza el trabajo.
             </summary>
         </member>
+        <member name="T:VeriFactu.Business.FlowControl.InvoiceBatch">
+            <summary>
+            Representa un lote de facturas a enviar a la AEAT.
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.FlowControl.InvoiceBatch._InvoiceActions">
+            <summary>
+            Colección de registros a enviar.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.Business.FlowControl.InvoiceBatch.#ctor">
+            <summary>
+            Constructor.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.Business.FlowControl.InvoiceBatch.#ctor(System.String)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="sellerID"></param>
+        </member>
+        <member name="M:VeriFactu.Business.FlowControl.InvoiceBatch.Send(System.Collections.Generic.List{VeriFactu.Business.Operations.InvoiceAction})">
+            <summary>
+            Envío el lote de facturas a la AEAT.
+            </summary>
+            <param name="invoiceActions">Lista de acciones para registros de factura.</param>
+            <returns>Devuelve La respuesta de la AEAT al envío.</returns>
+        </member>
+        <member name="M:VeriFactu.Business.FlowControl.InvoiceBatch.Post(System.Collections.Generic.List{VeriFactu.Business.Operations.InvoiceAction})">
+            <summary>
+            Contabiliza los elementos a envíar eliminándolos de la cola
+            de envío y devolviendolos en una lista.
+            </summary>
+            <param name="invoiceActions">Lista de elementos a contabilizar.</param>
+            <returns>Lista de los elementos a contabilizar.</returns>
+        </member>
+        <member name="M:VeriFactu.Business.FlowControl.InvoiceBatch.ProcessReponse(VeriFactu.Xml.Factu.Respuesta.RespuestaRegFactuSistemaFacturacion,System.Collections.Generic.List{VeriFactu.Business.Operations.InvoiceAction})">
+            <summary>
+            Procesa la respuesta de la AEAT.
+            </summary>
+            <param name="aeatResponse">Respuesta a procesar.</param>
+            <param name="invoiceActions">Elementos a los que corresponde la respuesta.</param>
+            <returns>Diccionario por número de factura con los resultados.</returns>
+        </member>
+        <member name="P:VeriFactu.Business.FlowControl.InvoiceBatch.SellerID">
+            <summary>
+            Identificador del vendedor.
+            Debe utilizarse el identificador fiscal si existe (NIF, VAT Number...).
+            En caso de no existir, se puede utilizar el número DUNS 
+            o cualquier otro identificador acordado.
+            </summary>        
+        </member>
+        <member name="M:VeriFactu.Business.FlowControl.InvoiceBatch.Add(VeriFactu.Business.InvoiceEntry)">
+            <summary>
+            Añade una entrada de factura al lote.
+            </summary>
+            <param name="invoiceEntry">Entrada de factura a añadir.</param>
+        </member>
+        <member name="M:VeriFactu.Business.FlowControl.InvoiceBatch.Save">
+            <summary>
+            Contabiliza en la cadena de bloques, envía a la AEAT
+            y devuelve los resultados del lote.
+            </summary>
+            <returns>Resultado del guardado del lote.</returns>
+        </member>
         <member name="T:VeriFactu.Business.FlowControl.InvoiceQueue">
             <summary>
             Gestiona el envío de registros a la AEAT con los intervalos de
@@ -343,6 +408,11 @@
         <member name="F:VeriFactu.Business.FlowControl.SellerQueue.MaxRecordNumber">
             <summary>
             Máximo número de registros a incluir en un envío.
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.FlowControl.SellerQueue._Locker">
+            <summary>
+            Bloqueo para thread safe.
             </summary>
         </member>
         <member name="F:VeriFactu.Business.FlowControl.SellerQueue._InvoiceActions">
@@ -3808,6 +3878,26 @@
             Endpoint consulta registros envíados.
             </summary>
         </member>
+        <member name="P:VeriFactu.Net.Rest.Api.EndPointValidateNIF">
+            <summary>
+            Endpoint validación NIF.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.Api.EndPointGetAeatInvoices">
+            <summary>
+            Endpoint consulta registros en AEAT.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.Api.EndPointGetFilteredList">
+            <summary>
+            Endpoint consulta envíos realizados.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.Api.EndPointCreateBatch">
+            <summary>
+            Endpoint envío de lotes.
+            </summary>
+        </member>
         <member name="P:VeriFactu.Net.Rest.Api.ServiceKey">
             <summary>
             Clave de acceso al API REST para Verifactu de
@@ -3871,6 +3961,37 @@
             <summary>
             Crea un código QR mediante el API.
             </summary>
+            <returns>Resultado llamada API.</returns>
+        </member>
+        <member name="M:VeriFactu.Net.Rest.ApiClient.ValidateNIF(VeriFactu.Business.Invoice)">
+            <summary>
+            Crea un código QR mediante el API.
+            </summary>
+            <param name="invoice">Factura para el QR.</param>
+            <returns>Resultado llamada API.</returns>
+        </member>
+        <member name="M:VeriFactu.Net.Rest.ApiClient.GetAeatInvoices(VeriFactu.Business.Invoice)">
+            <summary>
+            Recupera los registros en la AEAT realcionados
+            con un obligado tributario determinado.
+            </summary>
+            <param name="invoice">Factura con datos del obligado tributario
+            y una fecha del periodo mes/año que se desea recuperar.</param>
+            <returns>Resultado llamada API.</returns>
+        </member>
+        <member name="M:VeriFactu.Net.Rest.ApiClient.GetFilteredList(VeriFactu.Net.Rest.List.FilterSet)">
+            <summary>
+            Recupera los registros envíados según el
+            filtro pasado como parametro.
+            </summary>
+            <param name="filterSet">Filtro.</param>
+            <returns>Resultado llamada API.</returns>
+        </member>
+        <member name="M:VeriFactu.Net.Rest.ApiClient.CreateBatch(VeriFactu.Net.Rest.Batch.InvoicesBatch)">
+            <summary>
+            Envía un lote de facturas.
+            </summary>
+            <param name="invoicesBatch">Lote de facturas.</param>
             <returns>Resultado llamada API.</returns>
         </member>
         <member name="M:VeriFactu.Net.Rest.ApiClient.Ct">
@@ -4007,6 +4128,22 @@
             <summary>
             Indica si se trata de una subsanación de una factura.
             </summary>
+        </member>
+        <member name="T:VeriFactu.Net.Rest.Batch.InvoicesBatch">
+            <summary>
+            Representa un lote de facturas de Verifactu.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.Batch.InvoicesBatch.Invoices">
+            <summary>
+            Facturas del lote.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.Net.Rest.Batch.InvoicesBatch.ToString">
+            <summary>
+            Representacion textual de la instancia.
+            </summary>
+            <returns>Representacion textual de la instancia.</returns>
         </member>
         <member name="T:VeriFactu.Net.Rest.Ct">
             <summary>
@@ -4835,6 +4972,68 @@
             </summary>
             <param name="value">Valor a serializar.</param>
             <returns>Representación JSON de la propiedad.</returns>
+        </member>
+        <member name="T:VeriFactu.Net.Rest.List.FieldOperation">
+            <summary>
+            Representa una oparación a realizar en un campo.
+            datos.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.List.FieldOperation.FieldName">
+            <summary>
+            Nombre del campo por el que operar.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.List.FieldOperation.Operator">
+            <summary>
+            Operador para el la opearción: Comparación ( =, LIKE, IN, >...), Operación (SUM, MAX...)...
+            </summary>
+        </member>
+        <member name="T:VeriFactu.Net.Rest.List.Filter">
+            <summary>
+            Representa un filtro para recuperar
+            datos.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.List.Filter.Value">
+            <summary>
+            Valor de filtro.
+            </summary>
+        </member>
+        <member name="T:VeriFactu.Net.Rest.List.FilterSet">
+            <summary>
+            Representa un conjunto de filtros.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.Net.Rest.List.FilterSet.#ctor">
+            <summary>
+            Constructor.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.List.FilterSet.Filters">
+            <summary>
+            Conjunto de filtros-
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.List.FilterSet.TableNameSufix">
+            <summary>
+            Prefijo de tabla.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.List.FilterSet.Count">
+            <summary>
+            Número de registros a devolver.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.List.FilterSet.Offset">
+            <summary>
+            Offset de registros a devolver.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.List.FilterSet.OrderClause">
+            <summary>
+            Clausula de ordenación.
+            </summary>
         </member>
         <member name="T:VeriFactu.Net.Wsd">
             <summary>

@@ -74,8 +74,7 @@ namespace VeriFactu.Config
         /// <summary>
         /// Ruta al directorio de configuración.
         /// </summary>
-        static string _Path = Environment.GetFolderPath(
-            Environment.SpecialFolder.CommonApplicationData) + $"{_PathSep}VeriFactu{_PathSep}";
+        static string _Path = @"C:\EsteticSoft_Resources\VeriFactu\";
 
         /// <summary>
         /// Ruta al directorio de la cadena de bloques.
@@ -229,9 +228,9 @@ namespace VeriFactu.Config
                 VeriFactuHashInputEncoding = "UTF-8",
                 SistemaInformatico = new SistemaInformatico() 
                 { 
-                    NIF = "B12959755",
-                    NombreRazon = "IRENE SOLUTIONS SL",
-                    NombreSistemaInformatico = $"{Assembly.GetExecutingAssembly().GetName().Name}",
+                    NIF = "B63102883",
+                    NombreRazon = "ESTETICSOFT S.L.",
+                    NombreSistemaInformatico = "EsteticGEST",
                     IdSistemaInformatico = "01",
                     Version = $"{Assembly.GetExecutingAssembly().GetName().Version}",
                     NumeroInstalacion = numeroInstalacion,

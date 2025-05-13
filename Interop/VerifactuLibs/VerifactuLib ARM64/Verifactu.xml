@@ -1720,6 +1720,12 @@
             <returns>Lista con las descripciones de los errores
             encontrados.</returns>
         </member>
+        <member name="M:VeriFactu.Business.Validation.NIF.NifValidation.ToString">
+            <summary>
+            Representación textual de la instancia.
+            </summary>
+            <returns>Representación textual de la instancia.</returns>
+        </member>
         <member name="T:VeriFactu.Business.Validation.NIF.TaxId.TaxIdEs">
             <summary>
             Clase para almacenar, verificar y obtener información de números de identificación fiscal españoles
@@ -11715,6 +11721,16 @@
             </summary>
             <returns>Resultado de la operación.</returns>
         </member>
+        <member name="M:Verifactu.IVfInvoice.GetNifErrors(System.String,System.String)">
+            <summary>
+            Válida los datos de un NIF mediante el servicio
+            de validación de la AEAT.
+            </summary>
+            <param name="nif">NIF a validar.</param>
+            <param name="name">Nombre asociado al NIF a validar.</param>
+            <returns>Cadena con la descripción de los errores o null
+            si todo es correcto.</returns>
+        </member>
         <member name="T:Verifactu.VfInvoice">
             <summary>
             Representa una factura.
@@ -11909,6 +11925,16 @@
             </summary>
             <returns>Resultado de la operación.</returns>
         </member>
+        <member name="M:Verifactu.VfInvoice.GetNifErrors(System.String,System.String)">
+            <summary>
+            Válida los datos de un NIF mediante el servicio
+            de validación de la AEAT.
+            </summary>
+            <param name="nif">NIF a validar.</param>
+            <param name="name">Nombre asociado al NIF a validar.</param>
+            <returns>Cadena con la descripción de los errores o null
+            si todo es correcto.</returns>
+        </member>
         <member name="T:Verifactu.IVfInvoiceResult">
             <summary>
             Interfaz COM para la clase RectificationItem.
@@ -11960,6 +11986,42 @@
             Código seguro de verificación devuelto por la AEAT
             si todo ha ido bien.
             </summary>
+        </member>
+        <member name="T:Verifactu.IVfRectificationItem">
+            <summary>
+            Interfaz COM para la clase RectificationItem.
+            </summary>
+        </member>
+        <member name="P:Verifactu.IVfRectificationItem.InvoiceID">
+            <summary>
+            Identificador de la factura.
+            </summary>
+        </member>
+        <member name="P:Verifactu.IVfRectificationItem.InvoiceDate">
+            <summary>
+            Fecha emisión de documento.
+            </summary>        
+        </member>
+        <member name="T:Verifactu.VfRectificationItem">
+            <summary>
+            Representa una línea de impuestos.
+            </summary>
+        </member>
+        <member name="M:Verifactu.VfRectificationItem.#ctor">
+            <summary>
+            Constructor. Para COM necesitamos un constructor
+            sin parametros.
+            </summary>
+        </member>
+        <member name="P:Verifactu.VfRectificationItem.InvoiceID">
+            <summary>
+            Identificador de la factura.
+            </summary>
+        </member>
+        <member name="P:Verifactu.VfRectificationItem.InvoiceDate">
+            <summary>
+            Fecha emisión de documento.
+            </summary>        
         </member>
         <member name="T:Verifactu.IVfSettings">
             <summary>
@@ -12389,42 +12451,6 @@
             Indica si está activado el log de mensajes
             del sistema.
             </summary>
-        </member>
-        <member name="T:Verifactu.IVfRectificationItem">
-            <summary>
-            Interfaz COM para la clase RectificationItem.
-            </summary>
-        </member>
-        <member name="P:Verifactu.IVfRectificationItem.InvoiceID">
-            <summary>
-            Identificador de la factura.
-            </summary>
-        </member>
-        <member name="P:Verifactu.IVfRectificationItem.InvoiceDate">
-            <summary>
-            Fecha emisión de documento.
-            </summary>        
-        </member>
-        <member name="T:Verifactu.VfRectificationItem">
-            <summary>
-            Representa una línea de impuestos.
-            </summary>
-        </member>
-        <member name="M:Verifactu.VfRectificationItem.#ctor">
-            <summary>
-            Constructor. Para COM necesitamos un constructor
-            sin parametros.
-            </summary>
-        </member>
-        <member name="P:Verifactu.VfRectificationItem.InvoiceID">
-            <summary>
-            Identificador de la factura.
-            </summary>
-        </member>
-        <member name="P:Verifactu.VfRectificationItem.InvoiceDate">
-            <summary>
-            Fecha emisión de documento.
-            </summary>        
         </member>
         <member name="T:Verifactu.IVfTaxItem">
             <summary>

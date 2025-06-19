@@ -37,71 +37,25 @@
     address: info@irenesolutions.com
  */
 
-using System.Xml.Serialization;
-
-namespace VeriFactu.Xml.Factu.Consulta
+namespace VeriFactu.Xml.Factu.Alta
 {
 
     /// <summary>
-    /// Filtro consulta.
+    /// Identificador que especifica si la factura ha sido
+    /// emitida por un tercero o por el destinatario. L6.
     /// </summary>
-    public  class FiltroConsulta
+    public enum EmitidaPorTerceroODestinatario
     {
 
-        #region Propiedades Públicas de Instancia
+        /// <summary>
+        /// Destinatario.
+        /// </summary>
+        D,
 
         /// <summary>
-        /// Periodo a filtrar.
+        /// Tercero.
         /// </summary>
-        [XmlElement(Namespace = Namespaces.NamespaceCon)]
-        public PeriodoImputacion PeriodoImputacion { get; set; }
-
-        /// <summary>
-        /// Datos contraparte factura.
-        /// </summary>
-        [XmlElement(Namespace = Namespaces.NamespaceSF)]
-        public Interlocutor Contraparte { get; set; }
-
-        /// <summary>
-        /// Rango fechas de expedición.
-        /// </summary>
-        [XmlElement(Namespace = Namespaces.NamespaceCon)]
-        public FechaExpedicionFactura FechaExpedicionFactura { get; set; }
-
-        /// <summary>
-        /// Sistema informático.
-        /// </summary>
-        [XmlElement(Namespace = Namespaces.NamespaceSF)]
-        public SistemaInformatico SistemaInformatico { get; set; }
-
-        /// <summary>
-        /// Id. de la factura de corte para la paginación.
-        /// </summary>
-        [XmlElement(Namespace = Namespaces.NamespaceCon)]
-        public ClavePaginacion ClavePaginacion { get; set; }
-
-        /// <summary>
-        /// Datos adicionales respuesta.
-        /// </summary>
-        [XmlElement(Namespace = Namespaces.NamespaceSF)]
-        public DatosAdicionalesRespuesta DatosAdicionalesRespuesta { get; set; }
-
-        #endregion
-
-        #region Métodos Públicos de Instancia
-
-        /// <summary>
-        /// Representacioón textual de la instancia.
-        /// </summary>
-        /// <returns>Representacioón textual de la instancia.</returns>
-        public override string ToString()
-        {
-
-            return $"{PeriodoImputacion}, {Contraparte}, {FechaExpedicionFactura}";
-
-        }
-
-        #endregion
+        T
 
     }
 

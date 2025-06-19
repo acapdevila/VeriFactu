@@ -40,14 +40,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using VeriFactu.Business.Operations;
 using VeriFactu.Common;
-using VeriFactu.Xml;
 using VeriFactu.Xml.Factu;
 using VeriFactu.Xml.Factu.Respuesta;
-using VeriFactu.Xml.Soap;
 
 namespace VeriFactu.Business.FlowControl
 {
@@ -135,7 +131,7 @@ namespace VeriFactu.Business.FlowControl
         public SellerQueue(string sellerID) : base(sellerID)
         {
 
-            SellerID = sellerID;
+            SellerID = Key;
             _LastProcessMoment = new DateTime(1, 1, 1);
 
         }

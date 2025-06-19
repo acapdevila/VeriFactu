@@ -2,12 +2,12 @@
 
 # VeriFactu - Facturación sistema VERI*FACTU de la AEAT
 
-![workflow](https://github.com/mdiago/VeriFactu/actions/workflows/Verifactu.yml/badge.svg)
+
 
 ## :receipt: ¡Automatiza el envío de facturas con la AEAT de forma fácil y eficiente utilizando VeriFactu!
 <br>
 
-La finalidad de esta biblioteca es la generación, conservación y envío de registros; relacionados con la emisión de facturas a la AEAT mediante un sistema VERI*FACTU ( :nerd_face: [Declaración responsable del software](https://github.com/mdiago/VeriFactu/blob/main/NetFramework/Doc/Legal/Declaracion%20Responsable%20v1.0.38-release.pdf)).
+La finalidad de esta biblioteca es la generación, conservación y envío de registros; relacionados con la emisión de facturas a la AEAT mediante un sistema VERI*FACTU ( :nerd_face: [Declaración responsable del software](https://github.com/mdiago/VeriFactu/blob/main/NetFramework/Doc/Legal/Declaracion%20Responsable%20v1.0.41-release.pdf)).
 
 🚀 **Si esta librería te resulta útil, ayúdanos a seguir creciendo marcando ⭐ el repositorio en GitHub**. ¡Cada estrella nos motiva a seguir mejorando!
 
@@ -18,7 +18,7 @@ La finalidad de esta biblioteca es la generación, conservación y envío de reg
 > :globe_with_meridians: [Acceso al API REST](https://facturae.irenesolutions.com/verifactu/go)
 > 
 > Con el API REST disponemos de una herramienta de trabajo sencilla sin la complicación de preocuparnos de la gestión de certificados digitales.
-> ( :nerd_face: [Declaración responsable del API REST](https://github.com/mdiago/VeriFactu/blob/main/NetFramework/Doc/Legal/Declaracion%20Responsable%20API%20REST%20v1.0.17-beta.pdf)).
+> ( :nerd_face: [Declaración responsable del API REST](https://github.com/mdiago/VeriFactu/blob/main/NetFramework/Doc/Legal/Declaracion%20Responsable%20API%20REST-last-version.pdf)).
 
 <br>
 <br>
@@ -36,7 +36,8 @@ Para cualquier duda o consulta, puedes escribirnos a **info@irenesolutions.com**
 
 ### Instalar el paquete con el administrador de paquetes NuGet
 
-![image](https://github.com/user-attachments/assets/100efcb1-06fb-4a09-ae12-121fe772e056)
+![image](https://github.com/user-attachments/assets/d539b788-b49e-4969-8061-f6f021986200)
+
 
 ### Instalar el paquete con dotnet CLI
 

@@ -88,7 +88,9 @@ namespace VeriFactu.Business
 
             InvoiceID = invoiceID.Trim(); // La AEAT calcula el Hash sin espacios
             InvoiceDate = invoiceDate;
-            SellerID = sellerID.Trim(); 
+
+            var tSellerID = sellerID.Trim(); // La AEAT calcula el Hash sin espacios
+            SellerID = tSellerID.ToUpper(); // https://github.com/mdiago/VeriFactu/issues/65
 
         }
 
@@ -305,7 +307,7 @@ namespace VeriFactu.Business
 
             }
 
-            if (isTaxIdEs && (BuyerCountryID == "ES" || string.IsNullOrEmpty(BuyerCountryID)))
+            if (isTaxIdEs && BuyerIDType != IDType.NO_CENSADO && (BuyerCountryID == "ES" || string.IsNullOrEmpty(BuyerCountryID)))
                 return new List<Interlocutor>()
                 {
                     new Interlocutor
@@ -494,8 +496,8 @@ namespace VeriFactu.Business
                 IDVersion = Settings.Current.IDVersion,
                 IDFacturaAlta = new IDFactura()
                 {
-                    IDEmisorFactura = SellerID,
-                    NumSerieFactura = InvoiceID,
+                    IDEmisorFactura = SellerID.Trim(),
+                    NumSerieFactura = InvoiceID.Trim(),
                     FechaExpedicionFactura = XmlParser.GetXmlDate(InvoiceDate)                    
                 }, 
                 NombreRazonEmisor = SellerName,
@@ -513,15 +515,26 @@ namespace VeriFactu.Business
             if (OperationDate != null)
                 registroAlta.FechaOperacion = XmlParser.GetXmlDate(OperationDate);
 
-            if (RectificationItems?.Count > 0) 
+            var isRectification = Array.IndexOf(new TipoFactura[]{ TipoFactura.R1, TipoFactura.R2,
+                TipoFactura.R3, TipoFactura.R4, TipoFactura.R5 }, InvoiceType) != -1;
+
+            if (isRectification) 
             {
 
                 // Establecemos el tipo de rectificativa (Por diferencias es el valor por defecto)
-
                 if (RectificationType == TipoRectificativa.NA)
                     registroAlta.TipoRectificativa = TipoRectificativa.I; // Por defecto
-                
+
                 registroAlta.TipoRectificativaSpecified = true;
+
+            }
+
+            if (RectificationItems?.Count > 0) 
+            {
+
+                if (!isRectification)
+                    throw new InvalidOperationException("No se pueden incluir elementos en la lista 'RectificationItems'" +
+                        " si InvoiceType no es rectificativa (R1, R2, R3, R4, R5).");
 
                 // Añadimos las factura rectificadas
                 registroAlta.FacturasRectificadas = new IDFactura[RectificationItems.Count];
@@ -538,8 +551,14 @@ namespace VeriFactu.Business
 
             if (RectificationType != TipoRectificativa.NA)
             {
+
+                if (!isRectification)
+                    throw new InvalidOperationException("RectificationType no puede estar asignado (tiene que ser TipoRectificativa.NA)" +
+                        " si InvoiceType no es rectificativa (R1, R2, R3, R4, R5).");
+
                 registroAlta.TipoRectificativa = RectificationType;
                 registroAlta.TipoRectificativaSpecified = true;
+
             }
 
             return registroAlta;

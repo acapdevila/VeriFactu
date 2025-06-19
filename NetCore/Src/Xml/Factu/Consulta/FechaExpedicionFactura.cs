@@ -37,25 +37,50 @@
     address: info@irenesolutions.com
  */
 
-namespace VeriFactu.Xml.Factu.Alta
+using System.Xml.Serialization;
+
+namespace VeriFactu.Xml.Factu.Consulta
 {
 
     /// <summary>
-    /// Identificador que especifica si la factura ha sido
-    /// emitida por un tercero o por el destinatario. L6.
+    /// Datos para counsulta por fecha expedición factura.
     /// </summary>
-    public enum EmitidaPorTercerosODestinatario
+    public class FechaExpedicionFactura
     {
 
-        /// <summary>
-        /// Destinatario.
-        /// </summary>
-        D,
+        #region Propiedades Públicas de Instancia
 
         /// <summary>
-        /// Tercero.
+        /// <para> Fecha de emisión del registro de facturacion</para>
+        /// <para>Fecha (dd-mm-yyyy)</para>
         /// </summary>
-        T
+        [XmlElement(ElementName= "FechaExpedicionFactura", Namespace = Namespaces.NamespaceSF)]
+        public string FechaExpedicion { get; set; }
+
+        /// <summary>
+        /// <para>Intervalo de fechas para consulta.</para>
+        /// </summary>
+        [XmlElement(Namespace = Namespaces.NamespaceSF)]
+        public RangoFechaExpedicion RangoFechaExpedicion { get; set; }
+
+        #endregion
+
+        #region Métodos Públicos de Instancia
+
+        /// <summary>
+        /// Representacioón textual de la instancia.
+        /// </summary>
+        /// <returns>Representacioón textual de la instancia.</returns>
+        public override string ToString()
+        {
+
+            return $"{FechaExpedicion}," +
+                $"[{RangoFechaExpedicion.Desde}" +
+                $" - {RangoFechaExpedicion.Hasta}]";
+
+        }
+
+        #endregion
 
     }
 

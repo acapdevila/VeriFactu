@@ -78,8 +78,7 @@ namespace VeriFactu.Config
 		/// Ruta al directorio de configuración.
 		/// </summary>
         static readonly string _Path = @"C:\EsteticSoft_Resources\VeriFactu\";
-            RuntimeInformation.IsOSPlatform(OSPlatform.Create("OSX")) || RuntimeInformation.IsOSPlatform(OSPlatform.Create("IOS")) || 
-            RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID")) ?
+         
         /// <summary>
         /// Ruta al directorio de la cadena de bloques.
         /// </summary>

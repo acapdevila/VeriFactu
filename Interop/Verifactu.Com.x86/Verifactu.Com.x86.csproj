@@ -151,6 +151,9 @@
     <Compile Include="..\..\NetCore\Src\Business\Validation\Validators\Alta\Detalle\Regimen\ValidatorRegistroAltaDetalleDesgloseClaveRegimenCobroTerceros.cs">
       <Link>Src\Business\Validation\Validators\Alta\Detalle\Regimen\ValidatorRegistroAltaDetalleDesgloseClaveRegimenCobroTerceros.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\Src\Business\Validation\Validators\Alta\Detalle\Regimen\ValidatorRegistroAltaDetalleDesgloseClaveRegimenExportacion.cs">
+      <Link>Src\Business\Validation\Validators\Alta\Detalle\Regimen\ValidatorRegistroAltaDetalleDesgloseClaveRegimenExportacion.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\Src\Business\Validation\Validators\Alta\Detalle\Regimen\ValidatorRegistroAltaDetalleDesgloseClaveRegimenGrupoEntidades.cs">
       <Link>Src\Business\Validation\Validators\Alta\Detalle\Regimen\ValidatorRegistroAltaDetalleDesgloseClaveRegimenGrupoEntidades.cs</Link>
     </Compile>
@@ -168,6 +171,9 @@
     </Compile>
     <Compile Include="..\..\NetCore\Src\Business\Validation\Validators\Alta\Detalle\Regimen\ValidatorRegistroAltaDetalleDesgloseClaveRegimenRecc.cs">
       <Link>Src\Business\Validation\Validators\Alta\Detalle\Regimen\ValidatorRegistroAltaDetalleDesgloseClaveRegimenRecc.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\Src\Business\Validation\Validators\Alta\Detalle\Regimen\ValidatorRegistroAltaDetalleDesgloseClaveRegimenRegimenGeneral.cs">
+      <Link>Src\Business\Validation\Validators\Alta\Detalle\Regimen\ValidatorRegistroAltaDetalleDesgloseClaveRegimenRegimenGeneral.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Src\Business\Validation\Validators\Alta\Detalle\ValidatorRegistroAltaDetalleDesglose.cs">
       <Link>Src\Business\Validation\Validators\Alta\Detalle\ValidatorRegistroAltaDetalleDesglose.cs</Link>
@@ -280,6 +286,9 @@
     <Compile Include="..\..\NetCore\Src\Business\Validation\Validators\ValidatorSistemaInformatico.cs">
       <Link>Src\Business\Validation\Validators\ValidatorSistemaInformatico.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\Src\Business\Validation\Validators\ValidatorText.cs">
+      <Link>Src\Business\Validation\Validators\ValidatorText.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\Src\Business\Validation\VIES\ViesVatNumber.cs">
       <Link>Src\Business\Validation\VIES\ViesVatNumber.cs</Link>
     </Compile>
@@ -298,8 +307,14 @@
     <Compile Include="..\..\NetCore\Src\Config\Settings.cs">
       <Link>Src\Config\Settings.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\Src\DataStore\Document.cs">
+      <Link>Src\DataStore\Document.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\Src\DataStore\DocumentBox.cs">
       <Link>Src\DataStore\DocumentBox.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\Src\DataStore\DocumentSet.cs">
+      <Link>Src\DataStore\DocumentSet.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Src\DataStore\PeriodBox.cs">
       <Link>Src\DataStore\PeriodBox.cs</Link>
@@ -321,6 +336,9 @@
     </Compile>
     <Compile Include="..\..\NetCore\Src\Net\Rest\ApiInvoiceFix.cs">
       <Link>Src\Net\Rest\ApiInvoiceFix.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\Src\Net\Rest\ApiInvoiceFixRejected.cs">
+      <Link>Src\Net\Rest\ApiInvoiceFixRejected.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Src\Net\Rest\Batch\InvoicesBatch.cs">
       <Link>Src\Net\Rest\Batch\InvoicesBatch.cs</Link>
@@ -685,6 +703,9 @@
     <Compile Include="..\..\NetCore\Src\Xml\Factu\Consulta\ConsultaFactuSistemaFacturacion.cs">
       <Link>Src\Xml\Factu\Consulta\ConsultaFactuSistemaFacturacion.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\Src\Xml\Factu\Consulta\Contraparte.cs">
+      <Link>Src\Xml\Factu\Consulta\Contraparte.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\Src\Xml\Factu\Consulta\DatosAdicionalesRespuesta.cs">
       <Link>Src\Xml\Factu\Consulta\DatosAdicionalesRespuesta.cs</Link>
     </Compile>
@@ -837,6 +858,9 @@
     </Compile>
     <Compile Include="..\Verifactu.Com.x64\Src\Com\Interop\VfInvoice.cs">
       <Link>Src\Com\Interop\VfInvoice.cs</Link>
+    </Compile>
+    <Compile Include="..\Verifactu.Com.x64\Src\Com\Interop\VfInvoiceQuery.cs">
+      <Link>Src\Com\Interop\VfInvoiceQuery.cs</Link>
     </Compile>
     <Compile Include="..\Verifactu.Com.x64\Src\Com\Interop\VfInvoiceResult.cs">
       <Link>Src\Com\Interop\VfInvoiceResult.cs</Link>

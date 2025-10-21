@@ -91,12 +91,14 @@ namespace VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen
 
             var result = new List<string>();
 
+            // 1202 = Si ClaveRegimen es 06 TipoFactura no puede ser F2, F3, R5 y BaseImponibleACoste debe estar cumplimentado.
+
             // Si Impuesto = “01” (IVA), “03” (IGIC) o no se cumplimenta (considerándose “01” - IVA):
             // Si ClaveRegimen es igual a “06”:
             // Se validará que TipoFactura sea distinto de “F2”, “F3”, “R5”.
             // Campo BaseImponibleACoste deberá estar cumplimentado.
-            if (_DetalleDesglose.Impuesto != Impuesto.IVA &&
-                _DetalleDesglose.Impuesto != Impuesto.IGIC)
+            if (_DetalleDesglose.Impuesto == Impuesto.IVA ||
+                _DetalleDesglose.Impuesto == Impuesto.IGIC)
             {
 
                 if (Array.IndexOf(new TipoFactura[] { TipoFactura.F2, TipoFactura.F3, TipoFactura.R5 }, _RegistroAlta.TipoFactura) != -1)
@@ -111,7 +113,6 @@ namespace VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen
                         $" Cuando ClaveRegimen sea igual a “06”" +
                         $" campo BaseImponibleACoste deberá estar cumplimentado.");
             }
-
 
             return result;
 

@@ -75,7 +75,8 @@ namespace Verifactu
     #region Clase COM
 
     /// <summary>
-    /// Representa una línea de impuestos.
+    /// Representa información sobre la factura
+    /// a la que se refiere una rectificación.
     /// </summary>
     [Guid("119A584F-681D-4DE0-BBC1-929057B7F992")]
     [ClassInterface(ClassInterfaceType.None)]

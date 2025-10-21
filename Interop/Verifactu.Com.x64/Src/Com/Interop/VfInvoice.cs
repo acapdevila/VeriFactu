@@ -43,6 +43,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using VeriFactu.Business.Validation.NIF;
+using VeriFactu.Xml;
+using VeriFactu.Xml.Factu.Alta;
 
 namespace Verifactu
 {
@@ -166,6 +168,14 @@ namespace Verifactu
         string GetRegistroAlta();
 
         /// <summary>
+        /// Añade datos en rectificativa por sustitución de la
+        /// factura sustituida.
+        /// </summary>
+        /// <param name="taxItem">Datos factura sustituida.</param>
+        [DispId(3)]
+        void SetSubstitution(IVfTaxItem taxItem);
+
+        /// <summary>
         /// Obtiene el registro de alta para verifactu.
         /// </summary>
         /// <returns>Registro de alta para verifactu</returns>
@@ -179,6 +189,14 @@ namespace Verifactu
         /// <returns>Bitmap con la url de validación
         /// codificada en un código QR.</returns>
         void GetValidateQr(string path);
+
+        /// <summary>
+        /// Obtiene un bitmap con la url de validación
+        /// codificada en un código QR.
+        /// </summary>
+        /// <returns>Bitmap con la url de validación
+        /// codificada en un código QR.</returns>
+        byte[] GetValidateQrBytes();
 
         /// <summary>
         /// Devuelve la url para la validación del documento.
@@ -272,6 +290,11 @@ namespace Verifactu
         /// </summary>
         List<VeriFactu.Business.RectificationItem> _RectificationItems { get; set; }
 
+        /// <summary>
+        /// Información de rectificación sustitutiva.
+        /// </summary>
+        VeriFactu.Business.TaxItem _TaxItemSubstitution;
+
         #endregion
 
         #region Construtores de Instancia
@@ -338,9 +361,17 @@ namespace Verifactu
 
             result.BuyerIDType = (VeriFactu.Xml.Factu.IDType)buyerIDType;
 
+            if(!string.IsNullOrEmpty(BuyerCountryID))
+                result.BuyerCountryID = BuyerCountryID;
+
             result.TaxItems = _TaxItems;
+            result.CalculateTotals();
             result.RectificationItems = _RectificationItems;
 
+            if (_TaxItemSubstitution != null)
+                if (string.IsNullOrEmpty(InvoiceType) || InvoiceType[0] != 'R')
+                    throw new ArgumentException("Para poder establecer la sustitución de una factura, " +
+                        "el tipo de factura debe ser rectificativa.");
 
             return result;
 
@@ -530,6 +561,20 @@ namespace Verifactu
         public void GetValidateQr(string path)
         {
 
+            var bmQr = GetValidateQrBytes();
+            File.WriteAllBytes(path, bmQr);
+
+        }
+
+        /// <summary>
+        /// Obtiene un bitmap con la url de validación
+        /// codificada en un código QR.
+        /// </summary>
+        /// <returns>Bitmap con la url de validación
+        /// codificada en un código QR.</returns>
+        public byte[] GetValidateQrBytes()
+        {
+
             _Invoice = GetInvoice();
 
             // Obtenemos una instancia de la clase RegistroAlta a partir de
@@ -539,9 +584,10 @@ namespace Verifactu
             // Obtenemos la imágen del QR
             var bmQr = registro.GetValidateQr();
 
-            File.WriteAllBytes(path, bmQr);
+            return bmQr;
 
         }
+
 
         /// <summary>
         /// Devuelve la url para la validación del documento.
@@ -639,6 +685,28 @@ namespace Verifactu
         }
 
         /// <summary>
+        /// Añade datos en rectificativa por sustitución de la
+        /// factura sustituida.
+        /// </summary>
+        /// <param name="taxItem">Datos factura sustituida.</param>
+        public void SetSubstitution(IVfTaxItem taxItem)
+        {
+
+            if (string.IsNullOrEmpty(InvoiceType) || InvoiceType[0] != 'R')
+                throw new ArgumentException("Para poder establecer la sustitución de una factura, " +
+                    "el tipo de factura debe ser rectificativa.");
+
+            _TaxItemSubstitution = new VeriFactu.Business.TaxItem() 
+            { 
+                TaxBase = Math.Round(Convert.ToDecimal(taxItem.TaxBase), 2),
+                TaxAmount = Math.Round(Convert.ToDecimal(taxItem.TaxAmount), 2),
+                TaxAmountSurcharge = Math.Round(Convert.ToDecimal(taxItem.TaxAmountSurcharge), 2)
+            };
+
+        }
+
+
+        /// <summary>
         /// Envía la factura a Verifactu de la AEAT.
         /// </summary>
         /// <returns>Resultado de la operación.</returns>
@@ -652,6 +720,22 @@ namespace Verifactu
 
             _Invoice = GetInvoice();
             var entry = new VeriFactu.Business.InvoiceEntry(_Invoice);
+
+            if (_TaxItemSubstitution != null) 
+            {
+
+                var registroAlta = entry.Registro as RegistroAlta;
+
+                registroAlta.ImporteRectificacion = new ImporteRectificacion()
+                {
+                    BaseRectificada = XmlParser.GetXmlDecimal(_TaxItemSubstitution.TaxBase),
+                    CuotaRectificada = XmlParser.GetXmlDecimal(_TaxItemSubstitution.TaxAmount),
+                    CuotaRecargoRectificado = XmlParser.GetXmlDecimal(_TaxItemSubstitution.TaxAmountSurcharge)
+                };
+
+                registroAlta.TipoRectificativa = TipoRectificativa.S;
+
+            }
 
             try
             {
@@ -672,6 +756,7 @@ namespace Verifactu
             {
 
                 result.CSV = entry.CSV;
+                result.Response = entry.Response;
                 result.ResultMessage = "OK";
 
             }
@@ -679,6 +764,7 @@ namespace Verifactu
             {
 
                 result.ResultCode = entry.ErrorCode;
+                result.Response = entry.Response;
                 result.ResultMessage = entry.ErrorDescription;
 
             }
@@ -735,6 +821,7 @@ namespace Verifactu
             {
 
                 result.CSV = cancellation.CSV;
+                result.Response = cancellation.Response;
                 result.ResultMessage = "OK";
 
             }
@@ -742,6 +829,7 @@ namespace Verifactu
             {
 
                 result.ResultCode = cancellation.ErrorCode;
+                result.Response = cancellation.Response;
                 result.ResultMessage = cancellation.ErrorDescription;
 
             }

@@ -40,6 +40,7 @@
 using System;
 using System.Collections.Generic;
 using VeriFactu.Business.Validation.NIF.TaxId;
+using VeriFactu.Common;
 using VeriFactu.Config;
 using VeriFactu.Net.Rest.Json;
 using VeriFactu.Xml;
@@ -106,15 +107,16 @@ namespace VeriFactu.Business
 
             InvoiceType = registroAlta.TipoFactura;
             SellerName = registroAlta.NombreRazonEmisor;
+            Text = registroAlta.DescripcionOperacion;
 
             if (registroAlta.TipoRectificativaSpecified)
                 RectificationType = registroAlta.TipoRectificativa;
 
-            if (registroAlta.Destinatarios.Count > 1)
+            if (registroAlta.Destinatarios != null && registroAlta.Destinatarios.Count > 1)
                 throw new NotImplementedException("El método estático Invoice.FromRegistroAlta" +
                     " no implementa la conversión de RegistrosAlta con más de un destinatario.");
 
-            if (registroAlta.Destinatarios.Count == 1)
+            if (registroAlta.Destinatarios != null && registroAlta.Destinatarios.Count == 1)
             {
 
                 var destinatario = registroAlta.Destinatarios[0];
@@ -129,7 +131,8 @@ namespace VeriFactu.Business
 
             }
 
-            TaxItems = FromDesglose(registroAlta.Desglose);           
+            TaxItems = FromDesglose(registroAlta.Desglose);
+            CalculateTotals();
 
         }
 
@@ -182,7 +185,7 @@ namespace VeriFactu.Business
         /// <summary>
         /// Calcula los totales de la factura.
         /// </summary>
-        private void CalculateTotals() 
+        internal void CalculateTotals() 
         {
 
             TotalAmount = TotalTaxOutput = TotalTaxWithheld = TotalTaxOutputSurcharge = _NetAmount = 0;
@@ -248,6 +251,16 @@ namespace VeriFactu.Business
                     CuotaRepercutida = XmlParser.GetXmlDecimal(taxAmount),
                 };
 
+                // Evita error de la AEAT 1237: El valor del campo CalificacionOperacion está informado como N1 o N2 y el impuesto es IVA. 
+                // No se puede informar de los campos TipoImpositivo, CuotaRepercutida, TipoRecargoEquivalencia y CuotaRecargoEquivalencia.                
+                var isN = detalleDesglose?.CalificacionOperacion == CalificacionOperacion.N1 || 
+                    detalleDesglose?.CalificacionOperacion == CalificacionOperacion.N2; // No sujeta
+
+                if (isN &detalleDesglose?.Impuesto == Impuesto.IVA) 
+                    if (taxRate + taxAmount == 0)
+                        detalleDesglose.TipoImpositivo = detalleDesglose.CuotaRepercutida = null;
+
+                // Establece la serialización de la causa exención en su caso
                 if (taxitem.TaxException != CausaExencion.NA) 
                 {
                     detalleDesglose.OperacionExentaSpecified = true;
@@ -302,8 +315,13 @@ namespace VeriFactu.Business
             } 
             catch (Exception ex) 
             {
+                
+                Utils.Log($"{ex}");
 
-                throw;
+                if(ex.InnerException as TaxIdEsException != null)
+                    isTaxIdEs = false;
+                else
+                    throw;
 
             }
 
@@ -317,7 +335,6 @@ namespace VeriFactu.Business
                     }
                 };
 
-
             if(string.IsNullOrEmpty(BuyerCountryID))
                 throw new Exception($"Error en factura ({this}): Si BuyerID no es un identificador español válido" +
                     " (NIF, DNI, NIE...) es obligatorio que BuyerCountryID tenga un valor.");
@@ -327,6 +344,8 @@ namespace VeriFactu.Business
             if (!countryIdValid)
                 throw new Exception($"Error en factura ({this}): El código de pais consignado en BuyerCountryID='{BuyerCountryID}' no es válido.");
 
+            if (BuyerIDType == 0)
+                throw new Exception($"Error en factura ({this}): BuyerIDType debe tener un valor válido.");
 
             return new List<Interlocutor>()
                 {
@@ -409,13 +428,14 @@ namespace VeriFactu.Business
         /// es decir, el cliente) de la operación de la factura expedida.
         /// <para>Alfanumérico (2) (ISO 3166-1 alpha-2 codes) </para>
         /// </summary>        
+        [Json(Name = "CountryID")]
         public string BuyerCountryID { get; set; }
 
         /// <summary>
         /// Clave para establecer el tipo de identificación
         /// en el pais de residencia. L7.
         /// </summary>        
-        [Json(ExcludeOnDefault = true)]
+        [Json(ExcludeOnDefault = true, Name = "RelatedPartyIDType")]
         public IDType BuyerIDType { get; set; }
 
         /// <summary>
@@ -450,15 +470,38 @@ namespace VeriFactu.Business
         public List<TaxItem> TaxItems { get; set; }
 
         /// <summary>
-        /// Facturas rectificadas.
+        /// Esta colección almacena la información de las facturas modificados
+        /// por la presenta factura. Estas modificaciones pueden provenir de
+        /// dos situaciónes distintas:
+        /// <para>1. La factura es del tipo F3 y se trata de la conversión de una
+        /// factura simplificada a factura normal.</para>
+        /// <para>2. Se trata de una factura rectificativa: R1, R2, R3, R4, R5.</para>
+        /// Según la situación la información irá en el RegistroAlta en el
+        /// bloque de FacturasRectificadas o en el de FacturasSustituidas.
         /// </summary>
         public List<RectificationItem> RectificationItems { get; set; }
+
+        /// <summary>
+        /// BaseRectificada para rectificativas por sustitución 'S'.
+        /// </summary>        
+        public decimal RectificationTaxBase { get; set; }
+
+        /// <summary>
+        /// CuotaRectificada para rectificativas por sustitución 'S'.
+        /// </summary>        
+        public decimal RectificationTaxAmount { get; set; }
+
+        /// <summary>
+        /// CuotaRecargoRectificado para rectificativas por sustitución 'S'.
+        /// </summary>
+        public decimal RectificationTaxAmountSurcharge { get; set; }
 
         /// <summary>
         /// RegistroAlta a partir del cual se ha creado la factura, en el
         /// caso de que la instancia se haya creado a partir de un registro
         /// de alta.
         /// </summary>
+        [Json(JsonIgnore = true)]
         public RegistroAlta RegistroAltaSource 
         {
 
@@ -521,31 +564,62 @@ namespace VeriFactu.Business
             if (isRectification) 
             {
 
+                // Verificamos si es por sustitución
+                if (RectificationType == TipoRectificativa.S && RectificationTaxBase != 0) 
+                {
+
+                    registroAlta.ImporteRectificacion = new ImporteRectificacion()
+                    {
+                        BaseRectificada = XmlParser.GetXmlDecimal(RectificationTaxBase),
+                        CuotaRectificada = XmlParser.GetXmlDecimal(RectificationTaxAmount),
+                        CuotaRecargoRectificado = XmlParser.GetXmlDecimal(RectificationTaxAmountSurcharge)
+                    };
+
+                }
+
                 // Establecemos el tipo de rectificativa (Por diferencias es el valor por defecto)
                 if (RectificationType == TipoRectificativa.NA)
                     registroAlta.TipoRectificativa = TipoRectificativa.I; // Por defecto
 
-                registroAlta.TipoRectificativaSpecified = true;
+                registroAlta.TipoRectificativaSpecified = true;              
 
             }
 
             if (RectificationItems?.Count > 0) 
             {
 
-                if (!isRectification)
-                    throw new InvalidOperationException("No se pueden incluir elementos en la lista 'RectificationItems'" +
-                        " si InvoiceType no es rectificativa (R1, R2, R3, R4, R5).");
+                IDFactura[] idsFactura = new IDFactura[RectificationItems.Count];
 
-                // Añadimos las factura rectificadas
-                registroAlta.FacturasRectificadas = new IDFactura[RectificationItems.Count];
-
-                for(int rectificationIndex = 0; rectificationIndex< RectificationItems.Count; rectificationIndex++)
-                    registroAlta.FacturasRectificadas[rectificationIndex] =new IDFactura()
+                for (int rectificationIndex = 0; rectificationIndex < RectificationItems.Count; rectificationIndex++)
+                    idsFactura[rectificationIndex] = new IDFactura()
                     {
                         IDEmisorFactura = SellerID,
                         NumSerieFactura = RectificationItems[rectificationIndex].InvoiceID,
                         FechaExpedicionFactura = XmlParser.GetXmlDate(RectificationItems[rectificationIndex].InvoiceDate)
                     };
+
+                // Podemos tener dos situaciones: 
+                //  1. Se trata de una conversión a factura normal de una simplificada (F3)
+                //  2. Se trata de una rectificativa
+
+                if (InvoiceType == TipoFactura.F3) //  1. Se trata de una conversión a factura normal de una simplificada (F3)
+                {
+
+                    // Añadimos las factura sustituidas
+                    registroAlta.FacturasSustituidas = idsFactura;
+
+                }
+                else                                //  2. Se trata de una rectificativa
+                {
+
+                    if (!isRectification)
+                        throw new InvalidOperationException("No se pueden incluir elementos en la lista 'RectificationItems'" +
+                            " si InvoiceType no es rectificativa (R1, R2, R3, R4, R5).");
+
+                    // Añadimos las factura rectificadas
+                    registroAlta.FacturasRectificadas = idsFactura;
+
+                }
 
             }
 

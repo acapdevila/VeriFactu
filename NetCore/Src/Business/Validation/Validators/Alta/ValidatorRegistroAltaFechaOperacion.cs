@@ -90,6 +90,35 @@ namespace VeriFactu.Business.Validation.Validators.Alta
                     result.Add($"Error en el bloque RegistroAlta ({_RegistroAlta}):" +
                         $" La FechaOperacion ({_FechaOperacion:yyyy-MM-dd}) no debe ser superior al año siguiente de la fecha actual.");
 
+                // Error 1146
+                // Sólo se permite que la fecha de expedicion de la factura sea anterior a la fecha operación si los detalles del desglose son ClaveRegimen 14 o 15 e Impuesto 01, 03 o vacío.
+
+                if (_FechaExpedicion.CompareTo(_FechaOperacion) < 0) 
+                {
+
+                    var detalles = _RegistroAlta.Desglose;
+
+                    if (detalles != null)
+                    {
+
+                        foreach (var detalle in detalles)
+                        {
+
+                            var allowedPrev = (detalle.Impuesto == Xml.Factu.Impuesto.IVA || detalle.Impuesto == Xml.Factu.Impuesto.IGIC) 
+                                && (detalle.ClaveRegimenSpecified&&(detalle.ClaveRegimen == ClaveRegimen.ObraPteDevengoAdmonPublica || 
+                                detalle.ClaveRegimen == ClaveRegimen.TractoSucesivoPteDevengo));
+
+                            if (!allowedPrev)
+                                result.Add($"Error en el bloque RegistroAlta ({_RegistroAlta}):" +
+                                    $" Sólo se permite que la fecha de expedicion de la factura sea anterior a la fecha operación si los" +
+                                    $" detalles del desglose son ClaveRegimen 14 o 15 e Impuesto 01, 03 o vacío.");
+
+                        }
+
+                    }
+
+                }
+
             }
 
             return result;

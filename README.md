@@ -7,7 +7,7 @@
 ## :receipt: ¡Automatiza el envío de facturas con la AEAT de forma fácil y eficiente utilizando VeriFactu!
 <br>
 
-La finalidad de esta biblioteca es la generación, conservación y envío de registros; relacionados con la emisión de facturas a la AEAT mediante un sistema VERI*FACTU ( :nerd_face: [Declaración responsable del software](https://github.com/mdiago/VeriFactu/blob/main/NetFramework/Doc/Legal/Declaracion%20Responsable%20v1.0.41-release.pdf)).
+La finalidad de esta biblioteca es la generación, conservación y envío de registros; relacionados con la emisión de facturas a la AEAT mediante un sistema VERI*FACTU ( :nerd_face: [Declaración responsable del software](https://github.com/mdiago/VeriFactu/blob/main/NetFramework/Doc/Legal/Declaracion%20Responsable%20v1.0.52-release.pdf)).
 
 🚀 **Si esta librería te resulta útil, ayúdanos a seguir creciendo marcando ⭐ el repositorio en GitHub**. ¡Cada estrella nos motiva a seguir mejorando!
 
@@ -36,12 +36,11 @@ Para cualquier duda o consulta, puedes escribirnos a **info@irenesolutions.com**
 
 ### Instalar el paquete con el administrador de paquetes NuGet
 
-![image](https://github.com/user-attachments/assets/d539b788-b49e-4969-8061-f6f021986200)
-
+<img width="875" height="186" alt="image" src="https://github.com/user-attachments/assets/cf5cd849-87ba-4bfb-b8de-291bb411c6f8" />
 
 ### Instalar el paquete con dotnet CLI
 
-`dotnet add package Verifactu`
+`dotnet add package VeriFactu`
 
 <br>
 <br>
@@ -600,7 +599,7 @@ Al ejecutar este código, si tenemos el log activado obtendremos la siguiente in
 ```
 
 > [!IMPORTANT]
-> Es importante señalar que el control de flujo se desarrolla en un hilo diferente al principal. Es importante asegurarnos,
+> Es importante señalar que el control de flujo se desarrolla en un hilo diferente al principal. Debemos asegurarnos,
 > antes de finalizar la ejecución de nuestra aplicación en el hilo principal, de que finalizamos el proceso de control
 > de flujo.
 

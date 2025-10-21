@@ -40,6 +40,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
@@ -75,7 +76,7 @@ namespace VeriFactu.NoVeriFactu.Signature
         /// <summary>
         /// Información de la clave del certificado para la firma.
         /// </summary>
-        private RSACryptoServiceProvider SigningKey { get; set; }
+        private AsymmetricAlgorithm SigningKey { get; set; }
 
         /// <summary>
         /// Objeto KeyInfo de la firma.
@@ -95,7 +96,7 @@ namespace VeriFactu.NoVeriFactu.Signature
 
             Certificate = certificate;
             SigningKey = GetCertificateKey(Certificate);
-            KeyInfo = GetKeyInfo(Certificate, SigningKey);
+            KeyInfo = GetKeyInfo(Certificate);
 
         }
 
@@ -145,16 +146,23 @@ namespace VeriFactu.NoVeriFactu.Signature
         /// </summary>
         /// <param name="certificate">Certificado del que obtener la clave.</param>
         /// <returns>Clave válida para firma SA256.</returns>
-        private RSACryptoServiceProvider GetCertificateKey(X509Certificate2 certificate)
+        private AsymmetricAlgorithm GetCertificateKey(X509Certificate2 certificate)
         {
 
-            // Proveedor para SA256
-            var exportedKeyMaterial = certificate.PrivateKey.ToXmlString(true); //Include Private Parameters
-            var key = new RSACryptoServiceProvider(new CspParameters(PROV_RSA_AES));
-            key.PersistKeyInCsp = false;
-            key.FromXmlString(exportedKeyMaterial);
-            return key;
+#if LE_461
 
+            RSA src = RSACertificateExtensions.GetRSAPrivateKey(certificate);
+            if (src is null) throw new CryptographicException("El certificado no contiene una clave RSA privada.");
+            var p = src.ExportParameters(includePrivateParameters: true);
+            var clone = new RSACng();
+            clone.ImportParameters(p);
+
+            return clone;
+
+#else
+            return certificate.GetRSAPrivateKey();
+#endif
+            
         }
 
         /// <summary>
@@ -162,14 +170,13 @@ namespace VeriFactu.NoVeriFactu.Signature
         /// para el certificado de entrada.
         /// </summary>
         /// <param name="certificate">Certificado.</param>
-        /// <param name="key">Clave del certificado.</param>
         /// <returns>KeyInfo de la firma.</returns>
-        private KeyInfo GetKeyInfo(X509Certificate2 certificate, RSACryptoServiceProvider key)
+        private KeyInfo GetKeyInfo(X509Certificate2 certificate)
         {
 
             KeyInfo keyInfo = new KeyInfo();
-            keyInfo.AddClause(new KeyInfoX509Data(certificate)); // Añade elemento KeyInfo.X509Data.RSAKeyValue.X509Certificate
-            keyInfo.AddClause(new RSAKeyValue(key));  // Añade elemento KeyInfo.KeyValue.RSAKeyValue
+            keyInfo.AddClause(new KeyInfoX509Data(certificate, X509IncludeOption.WholeChain)); // Añade elemento KeyInfo.X509Data.RSAKeyValue.X509Certificate
+            keyInfo.AddClause(new RSAKeyValue(certificate.GetRSAPublicKey()));  // Añade elemento KeyInfo.KeyValue.RSAKeyValue
 
             return keyInfo;
 
@@ -274,7 +281,7 @@ namespace VeriFactu.NoVeriFactu.Signature
 
         }
 
-        #endregion
+#endregion
 
         #region Propiedades Públicas de Instancia
 
@@ -310,7 +317,6 @@ namespace VeriFactu.NoVeriFactu.Signature
             xmlDocument.LoadXml(System.Text.Encoding.UTF8.GetString(xml));            
 
             return Sign(xmlDocument, name);
-
 
         }
 

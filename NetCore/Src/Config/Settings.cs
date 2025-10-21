@@ -78,6 +78,8 @@ namespace VeriFactu.Config
 		/// Ruta al directorio de configuración.
 		/// </summary>
         static readonly string _Path = @"C:\EsteticSoft_Resources\VeriFactu\";
+            RuntimeInformation.IsOSPlatform(OSPlatform.Create("OSX")) || RuntimeInformation.IsOSPlatform(OSPlatform.Create("IOS")) || 
+            RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID")) ?
         /// <summary>
         /// Ruta al directorio de la cadena de bloques.
         /// </summary>
@@ -127,8 +129,6 @@ namespace VeriFactu.Config
 
             BlockchainInitialized = Blockchain.Blockchain.Initialized; // Inicia cadena de bloques
             Current.SistemaInformatico.IndicadorMultiplesOT = Seller.GetSellers().Count > 1 ? "S" : "N"; // Valor multiples OT
-
-            ApiClient.Ct(); 
 
         }
 
@@ -251,6 +251,8 @@ namespace VeriFactu.Config
                     EndPointGetAeatInvoices = "https://facturae.irenesolutions.com:8050/Kivu/Taxes/Verifactu/Invoices/GetAeatInvoices",
                     EndPointGetFilteredList = "https://facturae.irenesolutions.com:8050/Kivu/Taxes/Verifactu/Invoices/GetFilteredList",
                     EndPointCreateBatch = "https://facturae.irenesolutions.com:8050/Kivu/Taxes/Verifactu/Invoices/CreateBatch",
+                    EndPointValidateNIFs = "https://facturae.irenesolutions.com:8050/Kivu/Taxes/Verifactu/Invoices/ValidateNIFs",
+                    EndPointValidateViesVatNumber = "https://facturae.irenesolutions.com:8050/Kivu/Taxes/Verifactu/Invoices/ValidateViesVatNumber",
                     ServiceKey = "1234"
                 },
                 SkipNifAeatValidation = true,

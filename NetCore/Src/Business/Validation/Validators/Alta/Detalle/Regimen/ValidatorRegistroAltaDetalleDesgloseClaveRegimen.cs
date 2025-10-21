@@ -174,6 +174,8 @@ namespace VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen
 
             var _ValidatorByClaveRegimen = new Dictionary<ClaveRegimen, IValidator>() 
             {
+                // 1199 =  Si Impuesto es '01' (IVA), '03' (IGIC) o no se cumplimenta y ClaveRegimen es 01 no pueden marcarse la OperacionExenta E2, E3.
+                {ClaveRegimen.RegimenGeneral,               new ValidatorRegistroAltaDetalleDesgloseClaveRegimenRegimenGeneral(_Envelope, _RegistroAlta, _DetalleDesglose) },
                 // 15.6.1 ClaveRegimen 03. REBU.
                 {ClaveRegimen.Rebu,                         new ValidatorRegistroAltaDetalleDesgloseClaveRegimenRebu(_Envelope, _RegistroAlta, _DetalleDesglose) },
                 // 15.6.2 ClaveRegimen 04. Operaciones con oro de inversión.
@@ -189,7 +191,9 @@ namespace VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen
                 // 15.6.7 ClaveRegimen 11. Arrendamiento de local de negocio
                 {ClaveRegimen.ArrendamientoLocalNecocio,    new ValidatorRegistroAltaDetalleDesgloseClaveRegimenArrendamientoLocalNecocio(_Envelope, _RegistroAlta, _DetalleDesglose) },
                 // 15.6.8 ClaveRegimen 14. IVA pendiente AAPP.
-                {ClaveRegimen.ObraPteDevengoAdmonPublica,   new ValidatorRegistroAltaDetalleDesgloseClaveRegimenObraPteDevengoAdmonPublica(_Envelope, _RegistroAlta, _DetalleDesglose) }
+                {ClaveRegimen.ObraPteDevengoAdmonPublica,   new ValidatorRegistroAltaDetalleDesgloseClaveRegimenObraPteDevengoAdmonPublica(_Envelope, _RegistroAlta, _DetalleDesglose) },
+                // Añadido por error 1286: Si el impuesto es IVA(01), IGIC(03) o vacio, si ClaveRegimen es 02 solo se podrá informar OperacionExenta.
+                {ClaveRegimen.Exportacion,                  new ValidatorRegistroAltaDetalleDesgloseClaveRegimenExportacion(_Envelope, _RegistroAlta, _DetalleDesglose) },
             };
 
             if(_DetalleDesglose.ClaveRegimenSpecified)

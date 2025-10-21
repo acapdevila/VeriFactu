@@ -273,11 +273,12 @@
             </summary>
             <param name="sellerID"></param>
         </member>
-        <member name="M:VeriFactu.Business.FlowControl.InvoiceBatch.Send(System.Collections.Generic.List{VeriFactu.Business.Operations.InvoiceAction})">
+        <member name="M:VeriFactu.Business.FlowControl.InvoiceBatch.Send(System.Collections.Generic.List{VeriFactu.Business.Operations.InvoiceAction},System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Envío el lote de facturas a la AEAT.
             </summary>
             <param name="invoiceActions">Lista de acciones para registros de factura.</param>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Devuelve La respuesta de la AEAT al envío.</returns>
         </member>
         <member name="M:VeriFactu.Business.FlowControl.InvoiceBatch.Post(System.Collections.Generic.List{VeriFactu.Business.Operations.InvoiceAction})">
@@ -377,6 +378,11 @@
         <member name="P:VeriFactu.Business.FlowControl.InvoiceQueue.SentFinished">
             <summary>
             Acción a ejecutar en la finalización del envío.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Business.FlowControl.InvoiceQueue.SentError">
+            <summary>
+            Acción a ejecutar cuando un envío a la AEAT da error.
             </summary>
         </member>
         <member name="P:VeriFactu.Business.FlowControl.InvoiceQueue.Count">
@@ -695,6 +701,21 @@
             Facturas rectificadas.
             </summary>
         </member>
+        <member name="P:VeriFactu.Business.Invoice.RectificationTaxBase">
+            <summary>
+            BaseRectificada para rectificativas por sustitución 'S'.
+            </summary>        
+        </member>
+        <member name="P:VeriFactu.Business.Invoice.RectificationTaxAmount">
+            <summary>
+            CuotaRectificada para rectificativas por sustitución 'S'.
+            </summary>        
+        </member>
+        <member name="P:VeriFactu.Business.Invoice.RectificationTaxAmountSurcharge">
+            <summary>
+            CuotaRecargoRectificado para rectificativas por sustitución 'S'.
+            </summary>
+        </member>
         <member name="P:VeriFactu.Business.Invoice.RegistroAltaSource">
             <summary>
             RegistroAlta a partir del cual se ha creado la factura, en el
@@ -853,6 +874,12 @@
             <para> 3. Establece Posted = true.</para>
             </summary>
         </member>
+        <member name="M:VeriFactu.Business.InvoiceRetrySend.ProcessResponse(VeriFactu.Xml.Soap.Envelope)">
+            <summary>
+            Procesa y guarda respuesta de la AEAT al envío.
+            </summary>
+            <param name="envelope">Sobre con la respuesta de la AEAT.</param>
+        </member>
         <member name="P:VeriFactu.Business.InvoiceRetrySend.OriginalInvoiceFilePath">
             <summary>
             Path de la factura original en el directorio de facturas.
@@ -991,7 +1018,7 @@
             a contabilizar y enviar.
             </summary>
         </member>
-        <member name="M:VeriFactu.Business.Operations.InvoiceActionData.GeErrorInvoiceFilePath">
+        <member name="M:VeriFactu.Business.Operations.InvoiceActionData.GetErrorInvoiceFilePath">
             <summary>
             Path de la factura en el directorio de archivado de facturas
             si el documento a resultado erróneo.
@@ -1181,23 +1208,26 @@
             <returns>Path de la factura en el directorio de archivado de los datos de la
             cadena si el documento a resultado erróneo.</returns>
         </member>
-        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.Send(System.Byte[])">
+        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.Send(System.Byte[],System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Envía un xml en formato binario a la AEAT.
             </summary>
             <param name="xml">Archivo xml en formato binario a la AEAT.</param>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Devuelve las respuesta de la AEAT.</returns>
         </member>
-        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.Send">
+        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.Send(System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Envía el registro a la AEAT.
             </summary>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Devuelve las respuesta de la AEAT.</returns>
         </member>
-        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.ExecuteSend">
+        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.ExecuteSend(System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Ejecuta la contabilización del registro.
             </summary>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Si todo funciona correctamente devuelve null.
             En caso contrario devuelve una excepción con el error.</returns>
         </member>
@@ -1212,6 +1242,13 @@
             Procesa y guarda respuesta de la AEAT al envío.
             </summary>
             <param name="envelope">Sobre con la respuesta de la AEAT.</param>
+        </member>
+        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.GetIsNotCorrectoOAceptado">
+            <summary>
+            Devuelve true si el fichero no está en la AEAT
+            (es decir si no es 'Correcto' o 'AceptadoConErrores')
+            </summary>
+            <returns>Devuelve true si el fichero no está en la AEAT.</returns>
         </member>
         <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.ProcessResponse">
             <summary>
@@ -1301,27 +1338,30 @@
             sido procesada de la AEAT.
             </summary>
         </member>
-        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.SendXmlBytes(System.Byte[],System.String)">
+        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.SendXmlBytes(System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Envía un xml en formato binario a la AEAT.
             </summary>
             <param name="xml">Archivo xml en formato binario a la AEAT.</param>
-            /// <param name="op"> Acción para el webservice.</param>
+            <param name="op"> Acción para el webservice.</param>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Devuelve las respuesta de la AEAT.</returns>
         </member>
-        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.SendEnvelope(VeriFactu.Xml.Soap.Envelope,System.String)">
+        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.SendEnvelope(VeriFactu.Xml.Soap.Envelope,System.String,System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Envía un sobre SOAP.
             </summary>
             <param name="envelope">Sobre a enviar.</param>
             <param name="op">Acción del webservice.</param>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Respuesta del servidor.</returns>
         </member>
-        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.SendEnvelope(VeriFactu.Xml.Soap.Envelope)">
+        <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.SendEnvelope(VeriFactu.Xml.Soap.Envelope,System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Envía un sobre SOAP.
             </summary>
             <param name="envelope">Sobre a enviar.</param>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Respuesta del servidor.</returns>
         </member>
         <member name="M:VeriFactu.Business.Operations.InvoiceActionMessage.GetResponseEnvelope(System.String)">
@@ -1395,10 +1435,13 @@
             Gestor de cadena de bloques para el registro.
             </summary>
         </member>
-        <member name="M:VeriFactu.Business.Operations.InvoiceActionPost.Save">
+        <member name="M:VeriFactu.Business.Operations.InvoiceActionPost.Save(System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Contabiliza y envía a la AEAT el registro.
             </summary>
+            <param name="certificate">Certificado para la petición.</param>
+            <exception cref="T:System.InvalidOperationException">Si ya se ha guardado con anterioridad.</exception>
+            <exception cref="T:System.Exception">Si surge error en el envío.</exception>
         </member>
         <member name="T:VeriFactu.Business.Operations.InvoiceQuery">
             <summary>
@@ -1428,6 +1471,15 @@
             <returns> Objeto Invoice creado a partir de un registro
             de factura de una respuesta de consulta a la AEAT.</returns>
         </member>
+        <member name="M:VeriFactu.Business.Operations.InvoiceQuery.GetInterlocutor">
+            <summary>
+            Devuelve un interlocutor a partir del obligado
+            tributario al que pertenece la instancia.
+            </summary>
+            <returns> Interlocutor a partir del obligado
+            tributario al que pertenece la instancia.</returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:VeriFactu.Business.Operations.InvoiceQuery.GetEnvelope(System.String,System.String,System.Boolean,VeriFactu.Xml.Factu.Consulta.ClavePaginacion)" -->
         <member name="M:VeriFactu.Business.Operations.InvoiceQuery.GetSalesEnvelope(System.String,System.String,VeriFactu.Xml.Factu.Consulta.ClavePaginacion)">
             <summary>
             Devuelve un objeto Envelope con el filtro
@@ -1471,7 +1523,15 @@
             a partir de una respuesta de la AEAT a 
             una consulta de documentos.</returns>
         </member>
-        <member name="M:VeriFactu.Business.Operations.InvoiceQuery.GetSales(System.String,System.String,VeriFactu.Xml.Factu.Consulta.ClavePaginacion)">
+        <member name="M:VeriFactu.Business.Operations.InvoiceQuery.GetRegistro(System.Boolean)">
+            <summary>
+            Devuelve un registro para la consulta de facturas.
+            </summary>
+            <param name="isSales">Indica que se trata de la consulta
+            de factura emitidas. Si su valor es false es para recibidas.</param>
+            <returns> Registro para la consulta de facturas.</returns>
+        </member>
+        <member name="M:VeriFactu.Business.Operations.InvoiceQuery.GetSales(System.String,System.String,VeriFactu.Xml.Factu.Consulta.ClavePaginacion,System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Devuelve las facturas emitidas por el NIF
             facilitado en la propiedad PartyID.
@@ -1479,9 +1539,10 @@
             <param name="year">Año a consultar.</param>
             <param name="month">Mes a consultar.</param>
             <param name="offset">Id. de la factura de corte para la paginación.</param>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Facturas emitidas registradas en la AEAT.</returns>
         </member>
-        <member name="M:VeriFactu.Business.Operations.InvoiceQuery.GetPurchases(System.String,System.String,VeriFactu.Xml.Factu.Consulta.ClavePaginacion)">
+        <member name="M:VeriFactu.Business.Operations.InvoiceQuery.GetPurchases(System.String,System.String,VeriFactu.Xml.Factu.Consulta.ClavePaginacion,System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Devuelve las facturas emitidas por el NIF
             facilitado en la propiedad PartyID.
@@ -1489,7 +1550,17 @@
             <param name="year">Año a consultar.</param>
             <param name="month">Mes a consultar.</param>
             <param name="offset">Id. de la factura de corte para la paginación.</param>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Facturas emitidas registradas en la AEAT.</returns>
+        </member>
+        <member name="M:VeriFactu.Business.Operations.InvoiceQuery.GetDocuments(VeriFactu.Xml.Factu.Consulta.ConsultaFactuSistemaFacturacion,System.Security.Cryptography.X509Certificates.X509Certificate2)">
+            <summary>
+            Devuelve las facturas por el NIF
+            facilitado en la propiedad PartyID.
+            </summary>
+            <param name="registro"> Instancia de la clase ConsultaFactuSistemaFacturacion.</param>
+            <param name="certificate">Certificado para la petición.</param>
+            <returns>Facturas registradas en la AEAT.</returns>
         </member>
         <member name="M:VeriFactu.Business.Operations.InvoiceQuery.ToString">
             <summary>
@@ -1719,18 +1790,20 @@
             <param name="name">Nombre</param>
             <returns>Sobre SOAP de la petición.</returns>
         </member>
-        <member name="M:VeriFactu.Business.Validation.NIF.NifValidation.GetResponse">
+        <member name="M:VeriFactu.Business.Validation.NIF.NifValidation.GetResponse(System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Obtiene sobre SOAP de la respuesta.
             </summary>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Sobre SOAP de la respuesta.</returns>
         </member>
-        <member name="M:VeriFactu.Business.Validation.NIF.NifValidation.GetBatchErrors(System.Collections.Generic.List{VeriFactu.Xml.Nif.Contribuyente})">
+        <member name="M:VeriFactu.Business.Validation.NIF.NifValidation.GetBatchErrors(System.Collections.Generic.List{VeriFactu.Xml.Nif.Contribuyente},System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Valida un conjunto de NIFs en una única llamada
             al servicio de validación.
             </summary>
             <param name="items">Lista de contribuyentas a validar.</param>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Diccionario con los NIFs erróneos</returns>
         </member>
         <member name="M:VeriFactu.Business.Validation.NIF.NifValidation.GetErrors">
@@ -2207,6 +2280,30 @@
             </summary>
             <returns>Lista con los errores de un bloque en concreto.</returns>
         </member>
+        <member name="T:VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen.ValidatorRegistroAltaDetalleDesgloseClaveRegimenExportacion">
+            <summary>
+            Valida los datos de RegistroAlta DetalleDesglose ClaveRegimen 02. Exportacion.
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen.ValidatorRegistroAltaDetalleDesgloseClaveRegimenExportacion._DetalleDesglose">
+            <summary>
+            Interlocutor a validar.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen.ValidatorRegistroAltaDetalleDesgloseClaveRegimenExportacion.#ctor(VeriFactu.Xml.Soap.Envelope,VeriFactu.Xml.Factu.Alta.RegistroAlta,VeriFactu.Xml.Factu.Alta.DetalleDesglose)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="envelope"> Sobre SOAP envío.</param>
+            <param name="registroAlta"> Registro alta factura.</param>
+            <param name="detalleDesglose"> DetalleDesglose a validar. </param>
+        </member>
+        <member name="M:VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen.ValidatorRegistroAltaDetalleDesgloseClaveRegimenExportacion.GetBlockErrors">
+            <summary>
+            Obtiene los errores de un bloque en concreto.
+            </summary>
+            <returns>Lista con los errores de un bloque en concreto.</returns>
+        </member>
         <member name="T:VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen.ValidatorRegistroAltaDetalleDesgloseClaveRegimenGrupoEntidades">
             <summary>
             Valida los datos de RegistroAlta DetalleDesglose ClaveRegimen 06. Grupo de entidades nivel avanzado.
@@ -2346,6 +2443,30 @@
             <param name="detalleDesglose"> DetalleDesglose a validar. </param>
         </member>
         <member name="M:VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen.ValidatorRegistroAltaDetalleDesgloseClaveRegimenRecc.GetBlockErrors">
+            <summary>
+            Obtiene los errores de un bloque en concreto.
+            </summary>
+            <returns>Lista con los errores de un bloque en concreto.</returns>
+        </member>
+        <member name="T:VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen.ValidatorRegistroAltaDetalleDesgloseClaveRegimenRegimenGeneral">
+            <summary>
+            Valida los datos de RegistroAlta DetalleDesglose ClaveRegimen 01. RegimenGeneral.
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen.ValidatorRegistroAltaDetalleDesgloseClaveRegimenRegimenGeneral._DetalleDesglose">
+            <summary>
+            Interlocutor a validar.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen.ValidatorRegistroAltaDetalleDesgloseClaveRegimenRegimenGeneral.#ctor(VeriFactu.Xml.Soap.Envelope,VeriFactu.Xml.Factu.Alta.RegistroAlta,VeriFactu.Xml.Factu.Alta.DetalleDesglose)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="envelope"> Sobre SOAP envío.</param>
+            <param name="registroAlta"> Registro alta factura.</param>
+            <param name="detalleDesglose"> DetalleDesglose a validar. </param>
+        </member>
+        <member name="M:VeriFactu.Business.Validation.Validators.Alta.Detalle.Regimen.ValidatorRegistroAltaDetalleDesgloseClaveRegimenRegimenGeneral.GetBlockErrors">
             <summary>
             Obtiene los errores de un bloque en concreto.
             </summary>
@@ -3205,6 +3326,48 @@
             <returns>Lista con las descripciones de los 
             errores encontrado.</returns>
         </member>
+        <member name="T:VeriFactu.Business.Validation.Validators.ValidatorText">
+            <summary>
+            Validaciones de texto
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Business.Validation.Validators.ValidatorText.Name">
+            <summary>
+            Nombre del campo.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Business.Validation.Validators.ValidatorText.Text">
+            <summary>
+            Valor del texto a validar.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Business.Validation.Validators.ValidatorText.MaxLength">
+            <summary>
+            Longitud máxima.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Business.Validation.Validators.ValidatorText.Pattern">
+            <summary>
+            Patrón regex a cumplir por el texto.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.Business.Validation.Validators.ValidatorText.#ctor(System.String,System.String,System.Int32,System.String)">
+            <summary>
+            Construye una nueva clase de validación de texto.
+            </summary>
+            <param name="name">Nombre campo.</param>
+            <param name="text">Texto a validar.</param>
+            <param name="maxLength">Longitud máxima.</param>
+            <param name="pattern">Patrón regex a cumplir por el texto.</param>
+        </member>
+        <member name="M:VeriFactu.Business.Validation.Validators.ValidatorText.GetErrors">
+            <summary>
+            Ejecuta las validaciones y devuelve una lista
+            con los errores encontrados.
+            </summary>
+            <returns>Lista con las descripciones de los 
+            errores encontrado.</returns>
+        </member>
         <member name="T:VeriFactu.Business.Validation.VIES.ViesVatNumber">
             <summary>
             Validador de NIF comunitarios mediante API REST.
@@ -3215,6 +3378,89 @@
             <summary>
             Url del endpoint de validación.
             </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt8Num">
+            <summary>
+            8 caracteres numéricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt9Num">
+            <summary>
+            9 caracteres numéricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt10Num">
+            <summary>
+            10 caracteres numéricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt11Num">
+            <summary>
+            11 caracteres numéricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt12Num">
+            <summary>
+            12 caracteres numéricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt8To10Num">
+            <summary>
+            8, 9 ó 10 caracteres numéricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt2To10Num">
+            <summary>
+            de 2 a 10 caracteres numéricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt9o12Num">
+            <summary>
+            9 ó 12 caracteres numéricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt9o10Num">
+            <summary>
+             9 ó 10 caracteres numéricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt8To9Alfanum">
+            <summary>
+            8 ó 9 caracteres alfanuméricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt9Alfanum">
+            <summary>
+            9 caracteres alfanuméricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt11Alfanum">
+            <summary>
+            11 caracteres alfanumérico
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt12Alfanum">
+            <summary>
+            12 caracteres alfanumérico
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber.Ptt5o9o12Alfanum">
+            <summary>
+            5, 9 ó 12 caracteres alfanuméricos
+            </summary>
+        </member>
+        <member name="F:VeriFactu.Business.Validation.VIES.ViesVatNumber._PatternsByCountry">
+            <summary>
+            Patrones de expresiones regulares por pais.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.Business.Validation.VIES.ViesVatNumber.ValidateStructure(System.String)">
+            <summary>
+            Valida la estructura de un número de IVA intracomunitario.
+            </summary>
+            <param name="vatNumber">Número de IVA intracomunitario
+            incluyendo el código de país.</param>
+            <returns>True si es válido y false en caso contario.</returns>
         </member>
         <member name="M:VeriFactu.Business.Validation.VIES.ViesVatNumber.Validate(System.String)">
             <summary>
@@ -3374,12 +3620,12 @@
         </member>
         <member name="T:VeriFactu.Common.Utils">
             <summary>
-            Alunas utilidades generales.
+            Algunas utilidades generales.
             </summary>
         </member>
         <member name="F:VeriFactu.Common.Utils._HashAlgorithms">
             <summary>
-            Algoritmos de dgiest disponibles.
+            Algoritmos de digest disponibles.
             </summary>
         </member>
         <member name="F:VeriFactu.Common.Utils._Encodings">
@@ -3647,6 +3893,47 @@
             </summary>
             <param name="fileName">Nombre del archivo de configuración a utilizar.</param>
         </member>
+        <member name="T:VeriFactu.DataStore.Document">
+            <summary>
+            Representa un documento de factura generado en el sistema. Incluye todos los registros
+            de alta y anulación envíados, así como todas las respuestas de la AEAT relacionadas con
+            una factura determinada.
+            </summary>
+        </member>
+        <member name="F:VeriFactu.DataStore.Document._Sellers">
+            <summary>
+            Información de vendedores y periodos.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.DataStore.Document.PeriodOutbox">
+            <summary>
+            Bandeja salida periodo.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.DataStore.Document.#ctor(System.String,System.String)">
+            <summary>
+            Constructor.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.DataStore.Document.GetPeriodOutbox(System.String,System.String)">
+            <summary>
+            Obtiene los documentos de la bandeja de salida
+            de un vendedor y periodo determinados.
+            </summary>
+            <param name="sellerID">Id. vendedor.</param>
+            <param name="periodID">Periodo.</param>
+            <returns>Bandeja de salida del vendedor para un periodo.</returns>
+        </member>
+        <member name="P:VeriFactu.DataStore.Document.PeriodID">
+            <summary>
+            Periodo del documento.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.DataStore.Document.Seller">
+            <summary>
+            Vendedor del documento.
+            </summary>
+        </member>
         <member name="T:VeriFactu.DataStore.DocumentBox">
             <summary>
             Representa un documento de facturación.
@@ -3706,6 +3993,94 @@
             <param name="record">Registro a añadir.</param>
         </member>
         <member name="M:VeriFactu.DataStore.DocumentBox.ToString">
+            <summary>
+            Representación textual de la instancia.
+            </summary>
+            <returns>Representación textual de la instancia.</returns>
+        </member>
+        <member name="T:VeriFactu.DataStore.DocumentSet">
+            <summary>
+            Representa un conjunto de documentos de factura generado en el sistema. Incluye todos los registros
+            de alta y anulación envíados, así como todas las respuestas de la AEAT relacionadas con
+            las facturas de un emisor y periodo determinados.
+            </summary>
+        </member>
+        <member name="F:VeriFactu.DataStore.DocumentSet._Sellers">
+            <summary>
+            Información de vendedores y periodos.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.DataStore.DocumentSet.PeriodOutbox">
+            <summary>
+            Representa un periodo de facturación de un vendedor o emisor
+            de facturas en cuanto a los documentos de salida del sistema
+            en forma de registros de alta o anulación.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.DataStore.DocumentSet.PeriodInbox">
+            <summary>
+            Representa un periodo de facturación de un vendedor o emisor
+            de facturas en lo que se refiere a documentos de entrada o
+            respuesta por parte de la AEAT a los envíos.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.DataStore.DocumentSet.#ctor(System.String,System.String)">
+            <summary>
+            Constructor.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.DataStore.DocumentSet.GetPeriodOutbox(System.String,System.String)">
+            <summary>
+            Crea un gestor de los documentos de salida
+            de un periodo y emisor concretos.
+            </summary>
+            <param name="sellerID">Identificador fiscal del vencedor (NIF).</param>
+            <param name="periodID">Periodo de referencia en formato de año de 4 dígitos (Ejemplo '2025').</param>
+            <returns> Instancia de PeriodOutbox como gestor de los documentos de salida de un periodo.</returns>
+        </member>
+        <member name="P:VeriFactu.DataStore.DocumentSet.PeriodID">
+            <summary>
+            Periodo del documento.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.DataStore.DocumentSet.Seller">
+            <summary>
+            Vendedor del documento.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.DataStore.DocumentSet.DocumentsOut">
+            <summary>
+            Documentos de salida.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.DataStore.DocumentSet.DocumentsIn">
+            <summary>
+            Documentos de entrada.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.DataStore.DocumentSet.LoadDocuments">
+            <summary>
+            Carga todos los documentos de salida y entrada.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.DataStore.DocumentSet.GetErrors">
+            <summary>
+            <para> Devuelve los documentos:</para>
+            <para> Que no tengan una respuesta con estado 'Correcto'</para>
+            </summary>
+            <returns>Documentos con registro de salida que no tengan una
+            respuesta con estado 'Correcto'.</returns>
+        </member>
+        <member name="M:VeriFactu.DataStore.DocumentSet.GetDocumentInbox(System.String)">
+            <summary>
+            Devuelve las respuestas correspondientes al envío
+            de un documento.
+            </summary>
+            <param name="docKey">Clave del documento de factura.</param>
+            <returns> Respuestas correspondientes al envío
+            de un documento.</returns>
+        </member>
+        <member name="M:VeriFactu.DataStore.DocumentSet.ToString">
             <summary>
             Representación textual de la instancia.
             </summary>
@@ -3953,6 +4328,16 @@
             Endpoint envío de lotes.
             </summary>
         </member>
+        <member name="P:VeriFactu.Net.Rest.Api.EndPointValidateNIFs">
+            <summary>
+            Endpoint validación NIF por lotes.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.Api.EndPointValidateViesVatNumber">
+            <summary>
+            Endpoint validación número IVA intracomunitario.
+            </summary>
+        </member>
         <member name="P:VeriFactu.Net.Rest.Api.ServiceKey">
             <summary>
             Clave de acceso al API REST para Verifactu de
@@ -3998,6 +4383,13 @@
             <param name="invoice">Factura a remitir de alta como subsanación.</param>
             <returns>Resultado llamada API.</returns>
         </member>
+        <member name="M:VeriFactu.Net.Rest.ApiClient.CreateFixRejected(VeriFactu.Business.Invoice)">
+            <summary>
+            Crea un registro de alta de subsanación mediante el API.
+            </summary>
+            <param name="invoice">Factura a remitir de alta como subsanación.</param>
+            <returns>Resultado llamada API.</returns>
+        </member>
         <member name="M:VeriFactu.Net.Rest.ApiClient.Delete(VeriFactu.Business.Invoice)">
             <summary>
             Crea un registro de anulación mediante el API.
@@ -4020,9 +4412,10 @@
         </member>
         <member name="M:VeriFactu.Net.Rest.ApiClient.ValidateNIF(VeriFactu.Business.Invoice)">
             <summary>
-            Crea un código QR mediante el API.
+            Valida un NIF.
             </summary>
-            <param name="invoice">Factura para el QR.</param>
+            <param name="invoice">Factura con los datos
+            del obligado tributaria a validar.</param>
             <returns>Resultado llamada API.</returns>
         </member>
         <member name="M:VeriFactu.Net.Rest.ApiClient.GetAeatInvoices(VeriFactu.Business.Invoice)">
@@ -4047,6 +4440,22 @@
             Envía un lote de facturas.
             </summary>
             <param name="invoicesBatch">Lote de facturas.</param>
+            <returns>Resultado llamada API.</returns>
+        </member>
+        <member name="M:VeriFactu.Net.Rest.ApiClient.ValidateNIFs(VeriFactu.Net.Rest.Batch.InvoicesBatch)">
+            <summary>
+            Valida un lote de NIFs.
+            </summary>
+            <param name="invoicesBatch">Lote de facturas 
+            con datos de los obligados tributarios.</param>
+            <returns>Resultado llamada API.</returns>
+        </member>
+        <member name="M:VeriFactu.Net.Rest.ApiClient.ValidateViesVatNumber(VeriFactu.Business.Invoice)">
+            <summary>
+            Valida un número de IVA intracomunitario.
+            </summary>
+            <param name="invoice">Factura con datos del obligado tributario
+            a validar.</param>
             <returns>Resultado llamada API.</returns>
         </member>
         <member name="M:VeriFactu.Net.Rest.ApiClient.Ct">
@@ -4184,6 +4593,22 @@
             Indica si se trata de una subsanación de una factura.
             </summary>
         </member>
+        <member name="T:VeriFactu.Net.Rest.ApiInvoiceFixRejected">
+            <summary>
+            Extiende la clase Invoice para poder incluir la propiedad 
+            </summary>
+        </member>
+        <member name="M:VeriFactu.Net.Rest.ApiInvoiceFixRejected.#ctor(VeriFactu.Business.Invoice)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="invoice">Factura de subsanación con rechazo previo</param>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.ApiInvoiceFixRejected.IsRejected">
+            <summary>
+            Indica si se trata de una subsanación con rechazo previo de una factura.
+            </summary>
+        </member>
         <member name="T:VeriFactu.Net.Rest.Batch.InvoicesBatch">
             <summary>
             Representa un lote de facturas de Verifactu.
@@ -4293,6 +4718,11 @@
             objetos definidos mediante clases en cadenas formato JSON.
             </summary>
         </member>
+        <member name="F:VeriFactu.Net.Rest.Json.JsonAttribute._JsonIgnore">
+            <summary>
+            Ignorar para la serialización JSON.
+            </summary>
+        </member>
         <member name="F:VeriFactu.Net.Rest.Json.JsonAttribute._ExcludeOnDefault">
             <summary>
             Excluir si el valor del tipo
@@ -4308,6 +4738,12 @@
         <member name="M:VeriFactu.Net.Rest.Json.JsonAttribute.#ctor">
             <summary>
             Construye una nueva instancia de la clase JsonAttribute.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Net.Rest.Json.JsonAttribute.JsonIgnore">
+            <summary>
+            Indica que la propiedad se debe 
+            ignorar para la serialización JSON.
             </summary>
         </member>
         <member name="P:VeriFactu.Net.Rest.Json.JsonAttribute.ExcludeOnDefault">
@@ -5110,13 +5546,14 @@
             <param name="certificate">Verifica la validez del certificado.</param>
             <exception cref="T:System.InvalidOperationException">Se lanza si el certificado ha expirado (fecha NotAfter en el pasado).</exception>
         </member>
-        <member name="M:VeriFactu.Net.Wsd.Call(System.String,System.String,System.Xml.XmlDocument)">
+        <member name="M:VeriFactu.Net.Wsd.Call(System.String,System.String,System.Xml.XmlDocument,System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
-            Llama a al web service de la AEAT para el VeriFactu seleccionado.
+            Llama al web service de la AEAT para el VeriFactu seleccionado.
             </summary>
             <param name="url">Url destino.</param>
             <param name="action">Acción a ejecutar.</param>
             <param name="xmlDocument">Documento soap xml.</param>
+            <param name="certificate">Certificado para la petición.</param>
             <returns>Devuelve la respuesta.</returns>
         </member>
         <member name="M:VeriFactu.Net.Wsd.CreateWebRequest(System.String,System.String)">
@@ -5221,13 +5658,12 @@
             <param name="certificate">Certificado del que obtener la clave.</param>
             <returns>Clave válida para firma SA256.</returns>
         </member>
-        <member name="M:VeriFactu.NoVeriFactu.Signature.Signer.GetKeyInfo(System.Security.Cryptography.X509Certificates.X509Certificate2,System.Security.Cryptography.RSACryptoServiceProvider)">
+        <member name="M:VeriFactu.NoVeriFactu.Signature.Signer.GetKeyInfo(System.Security.Cryptography.X509Certificates.X509Certificate2)">
             <summary>
             Devuelve el objeto KeyInfo de la firma adecuado
             para el certificado de entrada.
             </summary>
             <param name="certificate">Certificado.</param>
-            <param name="key">Clave del certificado.</param>
             <returns>KeyInfo de la firma.</returns>
         </member>
         <member name="M:VeriFactu.NoVeriFactu.Signature.Signer.GetInXmlReference(System.String)">
@@ -5995,11 +6431,6 @@
             para facilitar la creación de firmas XML ampliando la
             funcionalidad de 'SignedXml' según las especificaciones
             de VERI*FACTU.
-            </summary>
-        </member>
-        <member name="F:VeriFactu.NoVeriFactu.Signature.Xades.VerifactuSignedXml.XmlDsigSHA256Url">
-            <summary>
-            Url para función hash SHA256
             </summary>
         </member>
         <member name="F:VeriFactu.NoVeriFactu.Signature.Xades.VerifactuSignedXml.XmlDsigRSASHA256Url">
@@ -7045,6 +7476,8 @@
             <summary>
             Representa un mapa de bits obtenido a partir de una
             matriz de bytes de código QR.
+            Formato es 32 bpp BGRA con alfa forzado a 255 por
+            compatibilidad con Ms Access.
             </summary>
         </member>
         <member name="M:VeriFactu.Qrcode.QrBitmap.#ctor(VeriFactu.Qrcode.ByteMatrix)">
@@ -9828,6 +10261,34 @@
             Filtro consulta.
             </summary>
         </member>
+        <member name="T:VeriFactu.Xml.Factu.Consulta.Contraparte">
+            <summary>
+             Datos parte interviniente en algún modo en la facturación.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Xml.Factu.Consulta.Contraparte.NombreRazon">
+            <summary>
+            <para>Nombre-razón social.</para>
+            <para>Alfanumérico(120).</para>
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Xml.Factu.Consulta.Contraparte.NIF">
+            <summary>
+            <para>NIF.</para>
+            <para>FormatoNIF(9).</para>
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Xml.Factu.Consulta.Contraparte.IDOtro">
+            <summary>
+            Id. fiscal no español.
+            </summary>
+        </member>
+        <member name="M:VeriFactu.Xml.Factu.Consulta.Contraparte.ToString">
+            <summary>
+            Representacioón textual de la instancia.
+            </summary>
+            <returns>Representacioón textual de la instancia.</returns>
+        </member>
         <member name="T:VeriFactu.Xml.Factu.Consulta.DatosAdicionalesRespuesta">
             <summary>
             Datos adicionales para la respuesta.
@@ -10063,6 +10524,26 @@
             <para>Alfanumérico (60)</para>
             </summary>
         </member>
+        <member name="P:VeriFactu.Xml.Factu.Consulta.Respuesta.DatosRegistroFacturacion.Subsanacion">
+            <summary>
+            Indica si se trata de un registro de subsanación
+            cuando su valor es 'S'.
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Xml.Factu.Consulta.Respuesta.DatosRegistroFacturacion.RechazoPrevio">
+            <summary>
+            Indica si existe un rechazo previo del registro
+            por parte de la AEAT.
+            <para>'N': No ha habido rechazo previo por la AEAT.</para>
+            <para>'S': Ha habido rechazo previo por la AEAT.</para>
+            <para>'X': Independientemente de si ha habido o no algún
+            rechazo previo por la AEAT, el registro de facturación no
+            existe en la AEAT (registro existente en ese sistema informático
+            o en algún sistema informático del obligado tributario y que no
+            se remitió a la AEAT, por ejemplo, al acogerse a la modalidad
+            «VERI*FACTU» desde la modalidad «NO VERI*FACTU»).</para>
+            </summary>
+        </member>
         <member name="P:VeriFactu.Xml.Factu.Consulta.Respuesta.DatosRegistroFacturacion.TipoFactura">
             <summary>
             <para>Clave del tipo de factura (L2).</para>
@@ -10144,6 +10625,12 @@
             <para> 7.º Huella del registro de facturación anterior.</para>
             <para> 8.º Fecha, hora y huso horario de generación del registro.</para>
             <para>Alfanumérico (64)</para>
+            </summary>
+        </member>
+        <member name="P:VeriFactu.Xml.Factu.Consulta.Respuesta.DatosRegistroFacturacion.Incidencia">
+            <summary>
+            Indica si se trata de un registro envíado tras
+            una incidencia técnica cuando su valor es 'S'.
             </summary>
         </member>
         <member name="M:VeriFactu.Xml.Factu.Consulta.Respuesta.DatosRegistroFacturacion.ToString">
@@ -11773,6 +12260,13 @@
             </summary>
             <returns>Registro de alta para verifactu</returns>
         </member>
+        <member name="M:Verifactu.IVfInvoice.SetSubstitution(Verifactu.IVfTaxItem)">
+            <summary>
+            Añade datos en rectificativa por sustitución de la
+            factura sustituida.
+            </summary>
+            <param name="taxItem">Datos factura sustituida.</param>
+        </member>
         <member name="M:Verifactu.IVfInvoice.GetRegistroAnulacion">
             <summary>
             Obtiene el registro de alta para verifactu.
@@ -11785,6 +12279,14 @@
             codificada en un código QR.
             </summary>
             <param name="path">Ruta donde se guardará el archivo de mapa de bits.</param>
+            <returns>Bitmap con la url de validación
+            codificada en un código QR.</returns>
+        </member>
+        <member name="M:Verifactu.IVfInvoice.GetValidateQrBytes">
+            <summary>
+            Obtiene un bitmap con la url de validación
+            codificada en un código QR.
+            </summary>
             <returns>Bitmap con la url de validación
             codificada en un código QR.</returns>
         </member>
@@ -11863,6 +12365,11 @@
         <member name="P:Verifactu.VfInvoice._RectificationItems">
             <summary>
             Facturas rectificadas.
+            </summary>
+        </member>
+        <member name="F:Verifactu.VfInvoice._TaxItemSubstitution">
+            <summary>
+            Información de rectificación sustitutiva.
             </summary>
         </member>
         <member name="M:Verifactu.VfInvoice.#ctor">
@@ -11992,6 +12499,14 @@
             <returns>Bitmap con la url de validación
             codificada en un código QR.</returns>
         </member>
+        <member name="M:Verifactu.VfInvoice.GetValidateQrBytes">
+            <summary>
+            Obtiene un bitmap con la url de validación
+            codificada en un código QR.
+            </summary>
+            <returns>Bitmap con la url de validación
+            codificada en un código QR.</returns>
+        </member>
         <member name="M:Verifactu.VfInvoice.GetUrlValidate">
             <summary>
             Devuelve la url para la validación del documento.
@@ -12022,6 +12537,13 @@
             </summary>
             <param name="index">Número de la línea a eliminar.</param>
         </member>
+        <member name="M:Verifactu.VfInvoice.SetSubstitution(Verifactu.IVfTaxItem)">
+            <summary>
+            Añade datos en rectificativa por sustitución de la
+            factura sustituida.
+            </summary>
+            <param name="taxItem">Datos factura sustituida.</param>
+        </member>
         <member name="M:Verifactu.VfInvoice.Send">
             <summary>
             Envía la factura a Verifactu de la AEAT.
@@ -12044,6 +12566,142 @@
             <returns>Cadena con la descripción de los errores o null
             si todo es correcto.</returns>
         </member>
+        <member name="T:Verifactu.IVfInvoiceQuery">
+            <summary>
+            Interfaz COM para la clase RectificationItem.
+            </summary>
+        </member>
+        <member name="P:Verifactu.IVfInvoiceQuery.SellerID">
+            <summary>
+            Identificador del vendedor.
+            Debe utilizarse el identificador fiscal si existe (NIF, VAT Number...).
+            En caso de no existir, se puede utilizar el número DUNS 
+            o cualquier otro identificador acordado.
+            </summary>        
+        </member>
+        <member name="P:Verifactu.IVfInvoiceQuery.SellerName">
+            <summary>
+            Nombre del vendedor.
+            </summary>        
+        </member>
+        <member name="P:Verifactu.IVfInvoiceQuery.Year">
+            <summary>
+            Año a consultar.
+            </summary>
+        </member>
+        <member name="P:Verifactu.IVfInvoiceQuery.Month">
+            <summary>
+            Mes a consultar.
+            </summary>
+        </member>
+        <member name="P:Verifactu.IVfInvoiceQuery.Invoices">
+            <summary>
+            Resultado última llamada.
+            </summary>
+        </member>
+        <member name="M:Verifactu.IVfInvoiceQuery.GetSales">
+            <summary>
+            Devuelve las facturas emitidas por el NIF
+            facilitado en la propiedad PartyID.
+            </summary>
+            <returns>Facturas emitidas registradas en la AEAT.</returns>
+        </member>
+        <member name="M:Verifactu.IVfInvoiceQuery.GetPurchases">
+            <summary>
+            Devuelve las facturas recibidas por el NIF
+            facilitado en la propiedad PartyID.
+            </summary>
+            <returns>Facturas recibidas registradas en la AEAT.</returns>
+        </member>
+        <member name="M:Verifactu.IVfInvoiceQuery.GetInvoicesCount">
+            <summary>
+            Devuelve el número de facturas.
+            </summary>
+            <returns>Número de facturas.</returns>
+        </member>
+        <member name="M:Verifactu.IVfInvoiceQuery.GetInvoice(System.Int32)">
+            <summary>
+            Devuelve una factura por su índice.
+            </summary>
+            <param name="index">Indice de la factura a devolver.</param>
+            <returns>Factura con el indice indicado.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Si el indice está fuera de rango.</exception>
+        </member>
+        <member name="T:Verifactu.VfInvoiceQuery">
+            <summary>
+            Resultado de un envio de alta o anulación a la AEAT.
+            </summary>
+        </member>
+        <member name="M:Verifactu.VfInvoiceQuery.#ctor">
+            <summary>
+            Constructor. Para COM necesitamos un constructor
+            sin parametros.
+            </summary>
+        </member>
+        <member name="M:Verifactu.VfInvoiceQuery.GetFromInvoiceList(System.Collections.Generic.List{VeriFactu.Business.Invoice})">
+            <summary>
+            Devuelve una lista de VfInvoices de una
+            lista de Invoices.
+            </summary>
+            <param name="invoices">Lista de Invoices a convertir.</param>
+            <returns> Lista de VfInvoices</returns>
+        </member>
+        <member name="P:Verifactu.VfInvoiceQuery.SellerID">
+            <summary>
+            Identificador del vendedor.
+            Debe utilizarse el identificador fiscal si existe (NIF, VAT Number...).
+            En caso de no existir, se puede utilizar el número DUNS 
+            o cualquier otro identificador acordado.
+            </summary>        
+        </member>
+        <member name="P:Verifactu.VfInvoiceQuery.SellerName">
+            <summary>
+            Nombre del vendedor.
+            </summary>        
+        </member>
+        <member name="P:Verifactu.VfInvoiceQuery.Year">
+            <summary>
+            Año a consultar.
+            </summary>
+        </member>
+        <member name="P:Verifactu.VfInvoiceQuery.Month">
+            <summary>
+            Mes a consultar.
+            </summary>
+        </member>
+        <member name="P:Verifactu.VfInvoiceQuery.Invoices">
+            <summary>
+            Resultado última llamada.
+            </summary>
+        </member>
+        <member name="M:Verifactu.VfInvoiceQuery.GetSales">
+            <summary>
+            Devuelve las facturas emitidas por el NIF
+            facilitado en la propiedad PartyID.
+            </summary>
+            <returns>Facturas emitidas registradas en la AEAT.</returns>
+        </member>
+        <member name="M:Verifactu.VfInvoiceQuery.GetPurchases">
+            <summary>
+            Devuelve las facturas recibidas por el NIF
+            facilitado en la propiedad PartyID.
+            </summary>
+            <returns>Facturas recibidas registradas en la AEAT.</returns>
+        </member>
+        <member name="M:Verifactu.VfInvoiceQuery.GetInvoicesCount">
+            <summary>
+            Devuelve el número de facturas.
+            </summary>
+            <returns>Número de facturas.</returns>
+        </member>
+        <member name="M:Verifactu.VfInvoiceQuery.GetInvoice(System.Int32)">
+            <summary>
+            Devuelve una factura por su índice.
+            </summary>
+            <param name="index">Indice de la factura a devolver.</param>
+            <returns>Factura con el indice indicado.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Si el indice está fuera de rango.</exception>
+        </member>
         <member name="T:Verifactu.IVfInvoiceResult">
             <summary>
             Interfaz COM para la clase RectificationItem.
@@ -12065,6 +12723,11 @@
             <summary>
             Código seguro de verificación devuelto por la AEAT
             si todo ha ido bien.
+            </summary>
+        </member>
+        <member name="P:Verifactu.IVfInvoiceResult.Response">
+            <summary>
+            Respuesta del envío a la AEAT.
             </summary>
         </member>
         <member name="T:Verifactu.VfInvoiceResult">
@@ -12094,6 +12757,11 @@
             <summary>
             Código seguro de verificación devuelto por la AEAT
             si todo ha ido bien.
+            </summary>
+        </member>
+        <member name="P:Verifactu.VfInvoiceResult.Response">
+            <summary>
+            Respuesta del envío a la AEAT.
             </summary>
         </member>
         <member name="T:Verifactu.IVfSettings">
@@ -12542,7 +13210,8 @@
         </member>
         <member name="T:Verifactu.VfRectificationItem">
             <summary>
-            Representa una línea de impuestos.
+            Representa información sobre la factura
+            a la que se refiere una rectificación.
             </summary>
         </member>
         <member name="M:Verifactu.VfRectificationItem.#ctor">

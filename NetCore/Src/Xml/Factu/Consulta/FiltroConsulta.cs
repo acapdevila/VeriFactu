@@ -59,8 +59,8 @@ namespace VeriFactu.Xml.Factu.Consulta
         /// <summary>
         /// Datos contraparte factura.
         /// </summary>
-        [XmlElement(Namespace = Namespaces.NamespaceSF)]
-        public Interlocutor Contraparte { get; set; }
+        [XmlElement(Namespace = Namespaces.NamespaceCon)]
+        public Contraparte Contraparte { get; set; }
 
         /// <summary>
         /// Rango fechas de expedición.

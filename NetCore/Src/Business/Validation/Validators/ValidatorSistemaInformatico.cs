@@ -115,6 +115,13 @@ namespace VeriFactu.Business.Validation.Validators
 
             var interlocutor = sistemaInformatico;
 
+            // El interlocutor en ObligadoEmision sólo puede contener datos en NIF y NombreRazon
+            if (interlocutor.NombreRazonRepresentante != null ||
+                interlocutor.NIFRepresentante != null)
+                result.Add($"Error en el bloque SistemaInformatico ({sistemaInformatico}): " +
+                    "Los datos de interlocutor 'NombreRazonRepresentante' y 'NIFRepresentante'" +
+                    " no pueden contener valor.");
+
             // Si se cumplimenta NIF, no deberá existir la agrupación IDOtro y viceversa, pero es obligatorio que se cumplimente uno de los dos.
             if (sistemaInformatico != null && !string.IsNullOrEmpty(sistemaInformatico.NIF) && sistemaInformatico.IDOtro != null)
                 result.Add($"Error en el bloque SistemaInformatico ({sistemaInformatico}):" +
@@ -161,6 +168,20 @@ namespace VeriFactu.Business.Validation.Validators
                         $" IDOtro.IDType = “03” (PASAPORTE) o IDOtro.IDType = “07” (NO_CENSADO).");
 
             }
+
+            // Validaciones de textos
+            result.AddRange(new ValidatorText("NombreSistemaInformatico", sistemaInformatico.NombreSistemaInformatico, 30).GetErrors());
+            result.AddRange(new ValidatorText("IdSistemaInformatico", sistemaInformatico.IdSistemaInformatico, 2).GetErrors());
+            result.AddRange(new ValidatorText("Version", sistemaInformatico.Version, 50).GetErrors());
+            result.AddRange(new ValidatorText("NumeroInstalacion", sistemaInformatico.NumeroInstalacion, 100).GetErrors());
+            result.AddRange(new ValidatorText("TipoUsoPosibleSoloVerifactu", sistemaInformatico.TipoUsoPosibleSoloVerifactu, 1, @"[SN]").GetErrors());
+            result.AddRange(new ValidatorText("TipoUsoPosibleMultiOT", sistemaInformatico.TipoUsoPosibleMultiOT, 1, @"[SN]").GetErrors());
+            result.AddRange(new ValidatorText("IndicadorMultiplesOT", sistemaInformatico.IndicadorMultiplesOT, 1, @"[SN]").GetErrors());
+            result.AddRange(new ValidatorText("NombreRazon", sistemaInformatico.NombreRazon, 120).GetErrors());
+            result.AddRange(new ValidatorText("NombreRazonRepresentante", sistemaInformatico.NombreRazonRepresentante, 120).GetErrors());
+
+            if (sistemaInformatico.IDOtro != null)
+                result.AddRange(new ValidatorText("ID", sistemaInformatico.IDOtro.ID, 20).GetErrors());
 
             return result;
 
